@@ -78,6 +78,17 @@ const AddUser = () => {
     }));
   };
 
+  // To check if the form is valid (all required fields are filled)
+  const isFormValid = () => {
+    return (
+      formData.fullName &&
+      formData.email &&
+      formData.phoneNumber &&
+      formData.branch &&
+      formData.department
+    );
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.temporaryPassword !== formData.confirmPassword) {
@@ -232,7 +243,9 @@ const AddUser = () => {
 
 
           <div className="mb-4">
-        <span className="block mb-1">Password Expiry:</span>
+          <Typography variant="h6" color="blue-gray" className="mb-3">
+          Password Expiry:<span className="text-red-600">*</span>
+      </Typography>
         <label className="flex items-center">
           <input
             type="checkbox"
@@ -251,6 +264,8 @@ const AddUser = () => {
             onChange={handleCheckboxChange}
             className="mr-2"
           />
+
+          
           Set Expiry Date
         </label>
       </div>
@@ -258,20 +273,41 @@ const AddUser = () => {
         </div>
       </div>
 
-      <div className="flex justify-between">
-        <button
-          type="submit"
-          className="bg-primary text-primary-foreground p-2 rounded"
-        >
-          Save
-        </button>
-        <button
-          type="button"
-          className="bg-secondary text-secondary-foreground p-2 rounded"
-        >
-          Cancel
-        </button>
-      </div>
+      <div className="flex items-center justify-center gap-4 mb-5">
+              <Button
+                type="submit"
+                loading={!isFormValid()}
+                variant="gradient"
+                className="flex items-center gap-3"
+              >
+                {isFormValid() ? "Submit" : "Complete All Fields"}
+              </Button>
+              {isFormValid() ? (
+                <Button
+                  variant="outlined"
+                  className="flex items-center gap-3"
+                  onClick={() => window.location.reload()}
+                >
+                  Refresh
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+                    />
+                  </svg>
+                </Button>
+              ) : (
+                ""
+              )}
+            </div>
     </form>
   );
 };
