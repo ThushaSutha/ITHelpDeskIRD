@@ -1,5 +1,5 @@
 
-import Header from '../../Layouts/Header';
+import Header from '../header/Header';
 
 import { Outlet } from 'react-router-dom';
 

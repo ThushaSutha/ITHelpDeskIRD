@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import logoImageSrc from '../images/logo-light.svg';
+import logoImageSrc from '../../images/logo-light.svg';
 import { FaBars, FaTimes } from 'react-icons/fa'; // For hamburger and close icons
 
 const Header = () => {

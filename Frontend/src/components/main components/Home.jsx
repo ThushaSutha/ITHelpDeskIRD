@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import serverIllustrationImageSrc from '../images/ticket.png';
+import serverIllustrationImageSrc from '../../images/ticket.png';
 
 const Home = ({
   heading = 'IT Help Desk Ticketing System',

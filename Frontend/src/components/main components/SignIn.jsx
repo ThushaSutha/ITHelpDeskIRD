@@ -1,5 +1,5 @@
 import React from "react";
-import serverIllustrationImageSrc from "../images/ticket.png";
+import serverIllustrationImageSrc from "../../images/ticket.png";
 
 
 function SignInForm() {
