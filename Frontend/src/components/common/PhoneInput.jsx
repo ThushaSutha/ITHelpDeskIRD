@@ -64,7 +64,7 @@ const PhoneInput = ({ name, value, onChange, onBlur, errorMessage }) => {
         onBlur={handleBlur}
         maxLength={15}
         type="tel"
-        size="lg"
+        
         placeholder="e.g., +94 76 123 4567"
         className="!border-t-blue-gray-200 focus:!border-t-gray-900"
         labelProps={{
