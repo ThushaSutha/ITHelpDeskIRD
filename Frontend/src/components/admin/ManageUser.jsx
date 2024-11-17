@@ -1,10 +1,9 @@
 import React from "react";
-import { TicketIcon } from "@heroicons/react/24/outline";
-
-// import TicketTable from "./components/TicketTable";
+// UserPlusIcon 
+import { UserPlusIcon } from "@heroicons/react/24/outline";
 import TicketTable from "../common/Table";
 
-function MyTicket() {
+function ManageUser() {
   const handleSearch = (query) => {
     console.log("Searching for:", query);
   };
@@ -54,36 +53,6 @@ function MyTicket() {
       status: "In-Progress",
       priority: "Low",
       update_at: "19/09/17",
-    },{
-      id: "789",
-      type: "RAMIS Issue",
-      status: "In-Progress",
-      priority: "Low",
-      update_at: "19/09/17",
-    },{
-      id: "789",
-      type: "RAMIS Issue",
-      status: "In-Progress",
-      priority: "Low",
-      update_at: "19/09/17",
-    },{
-      id: "789",
-      type: "RAMIS Issue",
-      status: "In-Progress",
-      priority: "Low",
-      update_at: "19/09/17",
-    },{
-      id: "789",
-      type: "RAMIS Issue",
-      status: "In-Progress",
-      priority: "Low",
-      update_at: "19/09/17",
-    },{
-      id: "789",
-      type: "RAMIS Issue",
-      status: "In-Progress",
-      priority: "Low",
-      update_at: "19/09/17",
     },
   ];
 
@@ -100,14 +69,15 @@ function MyTicket() {
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        addBtn="Create Ticket"
-        addBtnIcon={TicketIcon}
-        toolTipView="View Ticket"
-        toolTipEdit="Edit Ticket"
-        toolTipDelete="Delete Ticket"
+        addBtn="Add User"
+        addBtnIcon={UserPlusIcon}   
+        toolTipView="View User"
+        toolTipEdit="Edit User"
+        toolTipDelete="Delete User"
+        
       />
     </div>
   );
 }
 
-export default MyTicket;
+export default ManageUser;

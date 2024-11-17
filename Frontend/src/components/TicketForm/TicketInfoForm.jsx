@@ -2,7 +2,6 @@ import PropTypes from "prop-types"; // Import PropTypes for validation
 import { useState } from "react";
 import { Textarea , Typography } from "@material-tailwind/react";
 import InputField from "../common/InputField";
-import PhoneInput from "../common/PhoneInput";
 import Select2LikeComponent from "../common/Select2LikeComponent";
 import FileUpload from "../common/FileUpload";
 
@@ -58,11 +57,7 @@ const TicketInfoForm = ({
     setBrand(newBrand);
     handleChange("brand", newBrand);  
   };
-  const handlePhoneChange = (e) => {
-    const newPhone = e.target.value;
-    setPhone(newPhone);
-    handleChange("phone", newPhone);  
-  };
+ 
   const handleDescriptionChange = (e) => {
     const newDescription = e.target.value;
     setDescription(newDescription);
@@ -164,7 +159,7 @@ const TicketInfoForm = ({
               />
               </div>
 
-              <div className="mt-[26px]">
+              <div className="mt-7">
               {/* Brand field */}
               <InputField
                 label="Brand"

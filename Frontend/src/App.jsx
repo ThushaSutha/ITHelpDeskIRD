@@ -7,17 +7,30 @@ import MainLayout from "./Layouts/user/MainLayout";
 import BlankLayout from "./Layouts/user/BlankLayout";
 import AddUser from "./components/admin/AddUser";
 import Dashboard from "./components/main components/Dashboard";
+import ManageUser from "./components/admin/ManageUser";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+
+
 
 function App() {
+  
   return (
     <>
-      <Router>
+  
+       <Router>
+        {/* Toast Container for Global Notifications */}
+      <ToastContainer />
         <Routes>
+          
           <Route element={<MainLayout />}>
+          
             <Route path="/" element={<Home />} />
             <Route path="/dashboard/:view" element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/add" element={<AddUser />} />
+            <Route path="/users" element={<ManageUser />} />
           </Route>
 
           <Route element={<BlankLayout />}>
@@ -27,7 +40,7 @@ function App() {
           {/* <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} /> */}
         </Routes>
-      </Router>
+      </Router> 
     </>
   );
 }
