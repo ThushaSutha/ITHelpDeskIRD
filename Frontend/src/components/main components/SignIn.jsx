@@ -1,34 +1,44 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import serverIllustrationImageSrc from "../../images/ticket.png";
 import BackgroundImage from "../../assets/Home2.png";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Toast from "../common/Toast";
+import api from "../../api/auth"
+import { redirectTo } from "../../utils/helpers";
+import { useRedirect } from "../../contexts/RedirectContext";
 
 function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { redirectPath, setRedirectPath } = useRedirect();
+  
 
   const Auth = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       toast.warning("Please fill in all fields.", {
-        position: "bottom-left",
+        position: "top-right",
       });
       return;
     }
     try {
-      await axios.post("http://localhost:8080/api/auth/signin", {
-        email,
-        password,
-      });
+      const { data } = await api.post('/api/auth/signin', { email, password });
+            localStorage.setItem('token', data.accessToken);
+            console.log("token"+data.accessToken);
+            
       toast.success("Login successful!", {
         position: "top-right",
       });
-      navigate("/dashboard"); // Redirect on success
+      const path = redirectPath || "/dashboard";
+      console.log(path);
+      
+        setRedirectPath(null); // Clear the stored path after use
+        navigate(path);
+      // redirectTo(navigate, redirectPath);
     } catch (error) {
       if (error.response) {
         toast.error(error.response.data.message, {

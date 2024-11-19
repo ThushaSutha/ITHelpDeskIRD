@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import logoImageSrc from '../../images/logo-light.svg';
 import { FaBars, FaTimes } from 'react-icons/fa'; // For hamburger and close icons
+import LogoutButton from '../../components/common/LogoutButton';
 
 const Header = () => {
   const location = useLocation();
@@ -41,12 +42,13 @@ const Header = () => {
           <Link to="/dashboard/create-ticket" className="text-gray-300 hover:text-white transition duration-300">Create Ticket</Link>
           <a href="#" className="text-gray-300 hover:text-white transition duration-300">Contact</a>
           <a href="#" className="text-gray-300 hover:text-white transition duration-300">FAQ</a>
-          <Link
+          <LogoutButton />
+          {/* <Link
             to="/"
             className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition duration-300"
           >
             Logout
-          </Link>
+          </Link> */}
         </>
       )}
     </nav>

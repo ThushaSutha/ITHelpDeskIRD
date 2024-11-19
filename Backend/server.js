@@ -3,6 +3,10 @@
 const express = require("express");
 const cors = require("cors");
 
+const config = require("./config/auth.config");
+const authenticateToken = require('./config/auth');
+const auth = require("./middleware/authJwt")
+
 const PORT = process.env.PORT || 8080;
 
 const app = express();
@@ -26,6 +30,15 @@ app.get("/",(req,res)=>{
 res.json({message:"New Test API"});
 });
 
+
+
+
+
+
+// Protected Route
+app.get('/protected', auth.verifyToken, (req, res) => {
+    res.send('This is a protected route.');
+});
 
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);

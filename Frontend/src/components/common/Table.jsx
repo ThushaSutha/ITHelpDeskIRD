@@ -130,6 +130,7 @@ function TicketTable({
             <tr>
               <td colSpan={tableHeaders.length} className="p-4 text-center">
                 <LordIconComponent />
+                
                 <Typography variant="small" color="blue-gray" className="font-normal">
                   No records found
                 </Typography>
