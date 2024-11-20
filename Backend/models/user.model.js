@@ -23,7 +23,15 @@ module.exports = (sequelize,Sequelize)=>{
             allowNull:false
         },
         status:{
-            type:Sequelize.TINYINT
+            type:Sequelize.TINYINT,
+            allowNull:false
+        },
+        serial_number:{
+            type: Sequelize.STRING,
+            references:{
+                model: 'assets',
+                key: 'serial_number'
+            }
         },
         department_id:{
             type: Sequelize.INTEGER,

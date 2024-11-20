@@ -29,6 +29,15 @@ module.exports = (sequelize, Sequelize)=>{
                 model: 'users',
                 key: 'id'
             }
+        },
+        assigned_to:{
+            type: Sequelize.INTEGER,
+            references:{
+                model: 'users',
+                key: 'id'
+            }
         }
     })
-}
+
+    return Ticket;
+};
