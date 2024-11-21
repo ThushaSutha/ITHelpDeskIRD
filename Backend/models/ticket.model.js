@@ -16,12 +16,12 @@ module.exports = (sequelize, Sequelize)=>{
         status_id:{
             type: Sequelize.TINYINT,
             allowNull:false,
-            default: 0
+            defaultValue: 0
         },
         priority:{
             type: Sequelize.TINYINT,
             allowNull: false,
-            default:0
+            defaultValue:0
         },
         user_id:{
             type: Sequelize.INTEGER,
@@ -37,7 +37,12 @@ module.exports = (sequelize, Sequelize)=>{
                 key: 'id'
             }
         }
-    })
+    },{
+        tableName:'tickets',
+        timestamps: true,
+        paranoid: true
+
+    });
 
     return Ticket;
 };

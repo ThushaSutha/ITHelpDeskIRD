@@ -2,6 +2,7 @@ module.exports = {
     HOST: "localhost",
     USER: "root",
     PASSWORD: "",
+    TIMEZONE: '+05:30',
     DB: "ticket_system",
     dialect: "mysql",
     pool: {

@@ -11,7 +11,8 @@ module.exports = (sequelize ,Sequelize)=>{
         }
     },{
         tableName: 'department',
-        timestamps:true
+        timestamps:true,
+        paranoid: true
     });
 
     return Department;

@@ -43,7 +43,8 @@ module.exports = (sequelize, Sequelize) =>{
         }
     },{
         tableName: 'assets',
-        timestamps: true
+        timestamps: true,
+        paranoid: true
     });
 
     return Asset;

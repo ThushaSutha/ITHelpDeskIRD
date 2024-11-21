@@ -32,7 +32,8 @@ module.exports = (sequelize ,Sequelize) => {
 
     },{
         tableName:'service_companies',
-        timestamps: true
+        timestamps: true,
+        paranoid: true
     });
 
     return serviceCompany;

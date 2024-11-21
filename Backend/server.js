@@ -23,7 +23,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const db = require('./models');
-db.sequelize.sync();
+db.sequelize.sync({alter: false});
+
+//for development purpose
+// db.sequelize.sync({ force: true }).then(() => {
+//     console.log("Drop and re-sync db.");
+//   });
 
 
 app.get("/",(req,res)=>{
@@ -42,6 +47,7 @@ app.get('/protected', auth.verifyToken, (req, res) => {
 
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
+require('./routes/ticket.routes')(app);
 
 
 
@@ -54,3 +60,5 @@ app.listen(PORT,()=>{
     console.log(`Server listening on ${PORT}`);
     
 });
+
+app.listen();
