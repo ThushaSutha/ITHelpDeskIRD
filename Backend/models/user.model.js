@@ -31,17 +31,17 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: 0
 
         },
-        department_id: {
+        unit_id: {
             type: Sequelize.INTEGER,
             references: {
-                model: 'department',
-                key: 'department_id'
+                model: 'units',
+                key: 'id'
             }
         },
         serial_number: {
             type: Sequelize.STRING,
             references: {
-                model: 'assets', // Ensure 'assets' is the correct table name
+                model: 'assets', 
                 key: 'serial_number'
             }
         }
@@ -57,7 +57,7 @@ module.exports = (sequelize, Sequelize) => {
 
     // Define Associations
     User.associate = models => {
-        User.belongsTo(models.Department, { foreignKey: 'department_id', as: 'department' });
+        User.belongsTo(models.Unit, { foreignKey: 'unit_id', as: 'department' });
         User.hasMany(models.Asset, { foreignKey: 'serial_number', as: 'assets' });
     };
 

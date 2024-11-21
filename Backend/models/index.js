@@ -22,15 +22,19 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
+//region model
+db.region = require("../models/region.model")(sequelize, Sequelize);
+db.unit = require("../models/unit.model")(sequelize,Sequelize);
 db.department = require("../models/department.model")(sequelize,Sequelize);
 db.user = require("../models/user.model")(sequelize,Sequelize);
 db.ticket = require("../models/ticket.model")(sequelize, Sequelize);
 db.company = require("../models/company.model")(sequelize, Sequelize)
 db.asset = require("../models/asset.model")(sequelize, Sequelize);
 
+
 //relationship list 
-db.department.hasMany(db.user,{foreignKey: 'department_id'});
-db.user.belongsTo(db.department,{foreignKey: 'department_id'});
+db.unit.hasMany(db.user,{foreignKey: 'id'});
+db.user.belongsTo(db.unit,{foreignKey: 'unit_id'});
 
 //ticket table relationship
 // db.user.hasMany(db.ticket,{foreignKey: 'user_id'});

@@ -15,7 +15,7 @@ exports.signup = (req, res) => {
         password: hashedPassword, 
         role: req.body.role,
         status: req.body.status,
-        department_id: req.body.department_id
+        unit_id: req.body.unit_id
     })
     .then(user => {
         res.status(201).send({
@@ -54,13 +54,15 @@ exports.signin = async (req, res) => {
             expiresIn: 3600, // 1 hour
         });
 
-        const department = await user.getDepartment();
+        const unit = await user.getUnit();
+        console.log(unit);
+        
         res.status(200).send({
             id: user.id,
             name: user.name,
             email: user.email,
             role: user.role,
-            department: department ? department.department_name : null,
+            unit: unit ? unit.name : null,
             accessToken: token,
         });
     } catch (err) {
