@@ -11,7 +11,15 @@ module.exports = (sequelize, Sequelize) => {
         },
         email: {
             type: Sequelize.STRING(255),
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isEmail: true
+            }
+        },
+        role:{
+            type: Sequelize.STRING(20),
+            allowNull: false,
+            defaultValue: 'staff'
         },
         password: {
             type: Sequelize.STRING(255),
@@ -42,7 +50,9 @@ module.exports = (sequelize, Sequelize) => {
         indexes: [
             { fields: ['email'], unique: true },
             { fields: ['status'] }
-        ]
+        ],
+        timestamps: true,
+        paranoid: true
     });
 
     // Define Associations

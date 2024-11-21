@@ -29,8 +29,8 @@ db.company = require("../models/company.model")(sequelize, Sequelize)
 db.asset = require("../models/asset.model")(sequelize, Sequelize);
 
 //relationship list 
-// db.department.hasMany(db.user,{foreignKey: 'department_id'});
-// db.user.belongsTo(db.department,{foreignKey: 'department_id'});
+db.department.hasMany(db.user,{foreignKey: 'department_id'});
+db.user.belongsTo(db.department,{foreignKey: 'department_id'});
 
 //ticket table relationship
 // db.user.hasMany(db.ticket,{foreignKey: 'user_id'});

@@ -19,7 +19,7 @@ exports.signup = (req, res) => {
     })
     .then(user => {
         res.status(201).send({
-            message: "User was registered successfully!",
+            message: "User was created successfully!",
             user: {
                 id: user.user_id,
                 name: user.name,
@@ -64,15 +64,16 @@ exports.signin = async (req, res) => {
             accessToken: token,
         });
     } catch (err) {
+        res.status(500).send({ message: err.message || "Some error occurred while signing in"});
         // Detect specific errors
-        if (err.name === "SequelizeConnectionError") {
-            res.status(500).send({ message: "Database connection error. Please try again later." });
-        } else if (err.message.includes("ENOTFOUND") || err.message.includes("ECONNREFUSED")) {
-            res.status(500).send({ message: "Internet connectivity issue. Please check your connection." });
-        } else {
-            // General error handling
-            res.status(500).send({ message: "An unexpected error occurred. Please try again." });
-        }
+        // if (err.name === "SequelizeConnectionError") {
+        //     res.status(500).send({ message: "Database connection error. Please try again later." });
+        // } else if (err.message.includes("ENOTFOUND") || err.message.includes("ECONNREFUSED")) {
+        //     res.status(500).send({ message: "Internet connectivity issue. Please check your connection." });
+        // } else {
+        //     // General error handling
+        //     res.status(500).send({ message: "An unexpected error occurred. Please try again." });
+        // }
     }
 };
 
