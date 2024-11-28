@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../customHooks/auth/useAuth";
-import { useRedirect } from "../../../contexts/RedirectContext"
+import { useRedirect } from "../../contexts/RedirectContext"
 
 const ProtectedRoute = ({ children }) => {
   const navigate = useNavigate();

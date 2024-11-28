@@ -5,7 +5,7 @@ import serverIllustrationImageSrc from "../../images/ticket.png";
 import BackgroundImage from "../../assets/Home2.png";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Toast from "../common/Toast";
+import Toast from "../../components/common/Toast";
 import api from "../../api/auth"
 import { redirectTo } from "../../utils/helpers";
 import { useRedirect } from "../../contexts/RedirectContext";
@@ -28,16 +28,26 @@ function SignInForm() {
     try {
       const { data } = await api.post('/api/auth/signin', { email, password });
             localStorage.setItem('token', data.accessToken);
+            localStorage.setItem('Auth',data);
             console.log("token"+data.accessToken);
+            
             
       toast.success("Login successful!", {
         position: "top-right",
       });
-      const path = redirectPath || "/dashboard";
-      console.log(path);
-      
+      if(data.role === 'admin'){
+        const path = redirectPath || "/users";
         setRedirectPath(null); // Clear the stored path after use
         navigate(path);
+      }else{
+        const path = redirectPath || "/dashboard";
+        console.log(path);
+        setRedirectPath(null); // Clear the stored path after use
+        navigate(path);
+      }
+      
+      
+        
       // redirectTo(navigate, redirectPath);
     } catch (error) {
       if (error.response) {

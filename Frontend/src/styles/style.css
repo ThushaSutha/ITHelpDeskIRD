@@ -1,0 +1,33 @@
+/* table styles */
+
+/* Style the entire table */
+.rdt_Table {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  /* Style the table rows */
+  .rdt_TableRow {
+    background-color: #f9f9f9;
+  }
+  
+  .rdt_TableRow:hover {
+    background-color: #eaeaea;
+  }
+  
+  /* Style the sortable column headers */
+  .rdt_TableCol_Sortable {
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  /* Style individual cells */
+  .rdt_TableCell {
+    padding: 5px;
+    text-align: left;
+    margin: 0;
+  }
+
+  
+  

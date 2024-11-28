@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import InputField from "../common/InputField";
-import PhoneInput from "../common/PhoneInput";
+import PropTypes from "prop-types";
+import InputField from "../../components/common/InputField";
+import PhoneInput from "../../components/common/PhoneInput";
 import { Button, Input, Typography } from "@material-tailwind/react";
 import { v4 as uuidv4 } from "uuid";
-import Select2LikeComponent from "../common/Select2LikeComponent";
+import Select2LikeComponent from "../../components/common/Select2LikeComponent";
 import {
   Checkbox,
   Card,
@@ -11,36 +12,39 @@ import {
   ListItem,
   ListItemPrefix,
 } from "@material-tailwind/react";
+import userService from "../../services/user.service";
+import { useLocation} from 'react-router-dom';
 
-import {
-  Popover,
-  PopoverHandler,
-  PopoverContent,
-} from "@material-tailwind/react";
-import { format } from "date-fns";
-import { DayPicker } from "react-day-picker";
-import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 
-const AddUser = () => {
+
+
+const AddUser = ({isEditMode = false}) => {
+  const location = useLocation();
+  const userId = location.state?.userId;
+  const [data,setData] = useState(null);
+
   const [uniqueID, setUniqueID] = useState(null);
+  
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
   const [selectedUserRole, setSelectedUserRole] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [passwordError, setPasswordError] = useState(""); 
-  const [password, setPassword] = useState("");
   const today = new Date().toISOString().split("T")[0];
+  const role = ["Admin", "IT officer", "Staff"];
+  const regions = ["Jaffna", "Colombo", "Galle"];
+  const units = ["IT", "Accounts", "Network"];
+  const status = ["Active", "Inactive"];
 
-  const options = ["Option 1", "Option 2", "Option 3", "Option 4", "Option 5"];
   const [formData, setFormData] = useState({
     fullName: "",
     employeeId: "",
     email: "",
-    userRole: "Normal User",
+    userRole: "Staff",
     phoneNumber: "",
-    department: "",
-    branch: "MCO",
-    location: "Colombo-06",
+    region: "",
+    unit: "",
+    status: "",
     temporaryPassword: "",
     confirmPassword: "",
     passwordExpiry: {
@@ -69,12 +73,38 @@ const AddUser = () => {
     return password;
   };
 
+
+  //fetch user data 
+  const retrieveUser = async (id) => {
+    try {
+      const response = await userService.get(id);
+      console.log("Fetched user data:", response.data.data);
+      setData(response.data.data); // Store only the relevant data4
+      setFormData({
+        ...formData,
+        fullName: response.data.data.name,
+        email: response.data.data.email,
+        phoneNumber: response.data.data.phone,
+        userRole: response.data.data.role,
+        region: response.data.data.region,
+        unit: response.data.data.unit,
+        status: response.data.data.status,
+      });
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
   useEffect(() => {
+    if(isEditMode){
+      retrieveUser(userId);
+    }else{
     const id = generate6DigitFromUUID();
     const password = generatePassword();
     setUniqueID(id);
     console.log("Generated Unique ID:", id);
     console.log("Generated Password:", password);
+    
 
     
 
@@ -85,7 +115,8 @@ const AddUser = () => {
       temporaryPassword: password,
       confirmPassword: password
     }));
-  }, []);
+  }
+  }, [isEditMode,userId]);
 
 
 
@@ -131,22 +162,60 @@ const AddUser = () => {
   // To check if the form is valid (all required fields are filled)
   const isFormValid = () => {
     return (
-      formData.fullName &&
+      // formData.fullName &&
       formData.email &&
       formData.phoneNumber &&
-      formData.branch &&
-      formData.department
+      formData.region &&
+      formData.unit
     );
   };
 
-  const handleSubmit = (e) => {
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   if (formData.temporaryPassword !== formData.confirmPassword) {
+  //     setPasswordError("Passwords do not match");
+  //     return;
+  //   }
+
+  //   console.log(formData);
+  // };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.temporaryPassword !== formData.confirmPassword) {
       setPasswordError("Passwords do not match");
       return;
     }
 
-    console.log(formData);
+    const userPayload = {
+      name: formData.fullName,
+      email: formData.email,
+      phone: formData.phoneNumber,
+      role: formData.userRole,
+      unit: formData.unit,
+      region: formData.region,
+      status: formData.status,
+      password: formData.temporaryPassword,
+      passwordExpiry: formData.passwordExpiry,
+    };
+
+    if (isEditMode) {
+      try {
+        // await userService.update(userId, userPayload);
+        console.log("User updated successfully!",userPayload);
+        // history.push("/users"); // Redirect after successful update
+      } catch (error) {
+        console.error("Error updating user:", error);
+      }
+    } else {
+      try {
+        // await userService.create(userPayload);
+        console.log("User created successfully!",userPayload);
+        // history.push("/users"); // Redirect after successful creation
+      } catch (error) {
+        console.error("Error creating user:", error);
+      }
+    }
   };
 
   return (
@@ -158,22 +227,23 @@ const AddUser = () => {
           color="blue-gray"
           className="underline text-3xl text-black md:text-5xl"
         >
-          Add New User
+          {isEditMode ? "Update User" : "Add New User"} 
         </Typography>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-6">
-        <div className="flex-auto">
+      <div className="flex-auto">
           <InputField
             label="Full Name"
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
-            placeholder="e.g., John Pol"
+            placeholder="e.g., John Doe"
             type="text"
-            required={true}
+            required
           />
         </div>
+
 
         <div className="flex-auto">
           <PhoneInput
@@ -197,13 +267,13 @@ const AddUser = () => {
 
         <div className="flex-auto">
           <Select2LikeComponent
-            label="Department"
-            options={options}
+            label="Region"
+            options={regions}
             required={true}
             value={selectedDepartment}
             onSelectChange={(option) => {
               setSelectedDepartment(option);
-              setFormData((prevData) => ({ ...prevData, department: option }));
+              setFormData((prevData) => ({ ...prevData, region: option }));
             }}
           />
         </div>
@@ -224,13 +294,13 @@ const AddUser = () => {
 
         <div className="flex-auto">
           <Select2LikeComponent
-            label="Branch"
-            options={options}
+            label="Unit"
+            options={units}
             required={true}
             value={selectedBranch}
             onSelectChange={(option) => {
               setSelectedBranch(option);
-              setFormData((prevData) => ({ ...prevData, branch: option }));
+              setFormData((prevData) => ({ ...prevData, unit: option }));
             }}
           />
         </div>
@@ -238,7 +308,7 @@ const AddUser = () => {
         <div className="flex-auto">
           <Select2LikeComponent
             label="User Role"
-            options={options}
+            options={role}
             required={true}
             value={selectedUserRole}
             onSelectChange={(option) => {
@@ -250,13 +320,13 @@ const AddUser = () => {
 
         <div className="flex-auto">
           <Select2LikeComponent
-            label="Location"
-            options={options}
+            label="Status"
+            options={status}
             required={true}
             value={selectedLocation}
             onSelectChange={(option) => {
               setSelectedLocation(option);
-              setFormData((prevData) => ({ ...prevData, location: option }));
+              setFormData((prevData) => ({ ...prevData, status: option }));
             }}
           />
         </div>
@@ -370,43 +440,6 @@ const AddUser = () => {
                 </div>
               )}
             </Card>
-
-            {/* <Typography variant="h6" color="blue-gray" className="mb-3 mt-10"> */}
-              {/* Password Expiry <span className="text-red-600">*</span> */}
-            {/* </Typography> */}
-            {/* <label className="flex items-center"> */}
-              {/* <input */}
-                {/* type="checkbox" */}
-                {/* name="firstLogin" */}
-                {/* checked={formData.passwordExpiry.firstLogin} */}
-                {/* onChange={handleCheckboxChange} */}
-                {/* className="mr-2" */}
-              {/* /> */}
-              {/* Expires on first login */}
-            {/* </label> */}
-            {/* <label className="flex items-center">
-              <input
-                type="checkbox"
-                name="setExpiryDate"
-                checked={formData.passwordExpiry.setExpiryDate}
-                onChange={handleCheckboxChange}
-                className="mr-2"
-              />
-              Set Expiry Date
-            </label> */}
-
-            {/* Conditionally render the date picker */}
-            {/* {formData.passwordExpiry.setExpiryDate && (
-              <input
-                type="date"
-                name="expiryDate"
-                value={formData.passwordExpiry.expiryDate}
-                onChange={handleDateChange}
-                min={today}
-                className="mt-2 p-2 border border-gray-300 rounded"
-                required
-              />
-            )} */}
           </div>
         </div>
       </div>
@@ -449,5 +482,11 @@ const AddUser = () => {
     </form>
   );
 };
+
+AddUser.propTypes = {
+  isEditMode: PropTypes.bool,
+  userData: PropTypes.object
+};
+
 
 export default AddUser;

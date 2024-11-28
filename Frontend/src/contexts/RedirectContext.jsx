@@ -1,10 +1,8 @@
 import React, { createContext, useContext, useState } from "react";
 
 const RedirectContext = createContext();
-
 export const RedirectProvider = ({ children }) => {
     const [redirectPath, setRedirectPath] = useState(null);
-
     return (
         <RedirectContext.Provider value={{ redirectPath, setRedirectPath }}>
             {children}

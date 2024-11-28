@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button, Input, Typography } from "@material-tailwind/react";
-import ContactInfoForm from "../TicketForm/ContactInfoForm";
-import TicketInfoForm from "../TicketForm/TicketInfoForm";
-import LocationInfoForm from "../TicketForm/locationInfoForm";
+import ContactInfoForm from "../../components/TicketForm/ContactInfoForm";
+import TicketInfoForm from "../../components/TicketForm/TicketInfoForm";
+import LocationInfoForm from "../../components/TicketForm/locationInfoForm";
 import { v4 as uuidv4 } from "uuid";
 
 const TicketForm = () => {

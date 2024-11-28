@@ -1,9 +1,10 @@
 import React from "react";
-// UserPlusIcon 
-import { UserPlusIcon } from "@heroicons/react/24/outline";
-import TicketTable from "../common/Table";
+import { TicketIcon } from "@heroicons/react/24/outline";
 
-function ManageUser() {
+// import TicketTable from "./components/TicketTable";
+import TicketTable from "../../components/common/Table";
+
+function MyTicket() {
   const handleSearch = (query) => {
     console.log("Searching for:", query);
   };
@@ -30,7 +31,14 @@ function ManageUser() {
     { label: "Unmonitored", value: "unmonitored" },
   ];
 
-  const tableHeaders = ["Ticket ID", "Issue Type", "Status", "Priority", "Last Update", "Action"];
+  const tableHeaders = [
+    "Ticket ID",
+    "Issue Type",
+    "Status",
+    "Priority",
+    "Last Update",
+    "Action",
+  ];
 
   const tableData = [
     {
@@ -54,6 +62,41 @@ function ManageUser() {
       priority: "Low",
       update_at: "19/09/17",
     },
+    {
+      id: "789",
+      type: "RAMIS Issue",
+      status: "In-Progress",
+      priority: "Low",
+      update_at: "19/09/17",
+    },
+    {
+      id: "789",
+      type: "RAMIS Issue",
+      status: "In-Progress",
+      priority: "Low",
+      update_at: "19/09/17",
+    },
+    {
+      id: "789",
+      type: "RAMIS Issue",
+      status: "In-Progress",
+      priority: "Low",
+      update_at: "19/09/17",
+    },
+    {
+      id: "789",
+      type: "RAMIS Issue",
+      status: "In-Progress",
+      priority: "Low",
+      update_at: "19/09/17",
+    },
+    {
+      id: "789",
+      type: "RAMIS Issue",
+      status: "In-Progress",
+      priority: "Low",
+      update_at: "19/09/17",
+    },
   ];
 
   return (
@@ -69,15 +112,14 @@ function ManageUser() {
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        addBtn="Add User"
-        addBtnIcon={UserPlusIcon}   
-        toolTipView="View User"
-        toolTipEdit="Edit User"
-        toolTipDelete="Delete User"
-        
+        addBtn="Create Ticket"
+        addBtnIcon={TicketIcon}
+        toolTipView="View Ticket"
+        toolTipEdit="Edit Ticket"
+        toolTipDelete="Delete Ticket"
       />
     </div>
   );
 }
 
-export default ManageUser;
+export default MyTicket;

@@ -25,7 +25,6 @@ db.sequelize = sequelize;
 //region model
 db.region = require("../models/region.model")(sequelize, Sequelize);
 db.unit = require("../models/unit.model")(sequelize,Sequelize);
-db.department = require("../models/department.model")(sequelize,Sequelize);
 db.user = require("../models/user.model")(sequelize,Sequelize);
 db.ticket = require("../models/ticket.model")(sequelize, Sequelize);
 db.company = require("../models/company.model")(sequelize, Sequelize)
