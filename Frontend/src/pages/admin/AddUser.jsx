@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import InputField from "../../components/common/InputField";
 import PhoneInput from "../../components/common/PhoneInput";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Input, Typography } from "@material-tailwind/react";
 import { v4 as uuidv4 } from "uuid";
 import Select2LikeComponent from "../../components/common/Select2LikeComponent";
@@ -13,28 +14,39 @@ import {
   ListItemPrefix,
 } from "@material-tailwind/react";
 import userService from "../../services/user.service";
-import { useLocation} from 'react-router-dom';
+import { useLocation } from "react-router-dom";
+import RegionService from "../../services/region.service";
+import unitService from "../../services/unit.service";
+import Toast from "../../components/common/Toast"
+import { toast } from "react-toastify";
 
-
-
-
-const AddUser = ({isEditMode = false}) => {
+const AddUser = ({ isEditMode = false }) => {
+  const navigate = useNavigate();
   const location = useLocation();
   const userId = location.state?.userId;
-  const [data,setData] = useState(null);
+  console.log(userId);
+  // const [data,setData] = useState(null);
 
   const [uniqueID, setUniqueID] = useState(null);
-  
-  const [selectedDepartment, setSelectedDepartment] = useState("");
-  const [selectedBranch, setSelectedBranch] = useState("");
+
+  // const [uuidVlaue, setUuidValue] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [selectedUnit, setSelectedUnit] = useState("");
   const [selectedUserRole, setSelectedUserRole] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
-  const [passwordError, setPasswordError] = useState(""); 
+  const [selectedDesignation, setSelectedDesignation] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [regions, setRegions] = useState([]);
+  const [units, setUnits] = useState([]);
   const today = new Date().toISOString().split("T")[0];
-  const role = ["Admin", "IT officer", "Staff"];
-  const regions = ["Jaffna", "Colombo", "Galle"];
-  const units = ["IT", "Accounts", "Network"];
-  const status = ["Active", "Inactive"];
+  const role = [
+    { value: "admin", label: "Admin" },
+    { value: "it_officer", label: "IT officer" },
+    { value: "staff", label: "Staff" },
+  ];
+  const designation = [
+    { value: "HR", label: "HR" },
+    { value: "IT staff", label: "IT Staff" },
+  ];
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -45,6 +57,7 @@ const AddUser = ({isEditMode = false}) => {
     region: "",
     unit: "",
     status: "",
+    designation: "",
     temporaryPassword: "",
     confirmPassword: "",
     passwordExpiry: {
@@ -73,13 +86,13 @@ const AddUser = ({isEditMode = false}) => {
     return password;
   };
 
-
-  //fetch user data 
+  
+  //fetch user data
   const retrieveUser = async (id) => {
     try {
       const response = await userService.get(id);
       console.log("Fetched user data:", response.data.data);
-      setData(response.data.data); // Store only the relevant data4
+      // setData(response.data.data); // Store only the relevant data4
       setFormData({
         ...formData,
         fullName: response.data.data.name,
@@ -95,30 +108,63 @@ const AddUser = ({isEditMode = false}) => {
     }
   };
 
+  //fetch region data
+  const retrieveRegion = async () => {
+    try {
+      const response = await RegionService.getAll();
+      console.log(response.data.data);
+      // Transform the response data into the required format
+      const formattedRegions = response.data.data.map((region) => ({
+        label: region.name,
+        value: region.id,
+      }));
+
+      setRegions(formattedRegions);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //fetch region data
+  const retrieveUnit = async () => {
+    try {
+      const response = await unitService.getAll();
+      console.log(response.data.data);
+      // Transform the response data into the required format
+      const formattedUnit = response.data.data.map((unit) => ({
+        label: unit.name,
+        value: unit.id,
+      }));
+
+      setUnits(formattedUnit);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    if(isEditMode){
+    if (isEditMode) {
       retrieveUser(userId);
-    }else{
-    const id = generate6DigitFromUUID();
-    const password = generatePassword();
-    setUniqueID(id);
-    console.log("Generated Unique ID:", id);
-    console.log("Generated Password:", password);
-    
+    }
+  }, [isEditMode, userId]);
 
-    
+  useEffect(() => {
+    retrieveRegion();
+    retrieveUnit();
+    if (!isEditMode) {
+      const id = generate6DigitFromUUID();
+      const password = generatePassword();
+      setUniqueID(id);
 
-    // Update employeeId once uniqueID is generated
-    setFormData((prevData) => ({
-      ...prevData,
-      employeeId: prevData.fullName.split(" ")[0] + id,
-      temporaryPassword: password,
-      confirmPassword: password
-    }));
-  }
-  }, [isEditMode,userId]);
-
-
+      setFormData((prevData) => ({
+        ...prevData,
+        // employeeId: prevData.fullName.split(" ")[0] + id,
+        
+        temporaryPassword: password,
+        confirmPassword: password,
+      }));
+    }
+  }, [isEditMode]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -148,6 +194,14 @@ const AddUser = ({isEditMode = false}) => {
     }));
   };
 
+  const handleStatusCheckboxChange = (e) => {
+    const { checked } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      status: checked,
+    }));
+  };
+
   const handleDateChange = (e) => {
     const { value } = e.target;
     setFormData((prevData) => ({
@@ -163,10 +217,7 @@ const AddUser = ({isEditMode = false}) => {
   const isFormValid = () => {
     return (
       // formData.fullName &&
-      formData.email &&
-      formData.phoneNumber &&
-      formData.region &&
-      formData.unit
+      formData.email && formData.phoneNumber 
     );
   };
 
@@ -188,21 +239,23 @@ const AddUser = ({isEditMode = false}) => {
     }
 
     const userPayload = {
+      emId: formData.fullName+uniqueID,
       name: formData.fullName,
       email: formData.email,
       phone: formData.phoneNumber,
       role: formData.userRole,
       unit: formData.unit,
-      region: formData.region,
       status: formData.status,
+      designation: formData.designation,
       password: formData.temporaryPassword,
-      passwordExpiry: formData.passwordExpiry,
+      firstLogin: formData.passwordExpiry.firstLogin,
+      setExpiryDate: formData.passwordExpiry.setExpiryDate
     };
 
     if (isEditMode) {
       try {
         // await userService.update(userId, userPayload);
-        console.log("User updated successfully!",userPayload);
+        console.log("User updated successfully!", userPayload);
         // history.push("/users"); // Redirect after successful update
       } catch (error) {
         console.error("Error updating user:", error);
@@ -210,7 +263,29 @@ const AddUser = ({isEditMode = false}) => {
     } else {
       try {
         // await userService.create(userPayload);
-        console.log("User created successfully!",userPayload);
+        try {
+          const response = await userService.create(userPayload);
+          toast.success(response.data.message, {
+            position: "top-right",
+          });
+          navigate("/users");
+          console.log(userPayload);
+          console.log(response.data.message);
+        } catch (error) {
+          console.log(userPayload);
+          console.log(error);
+          
+          if(error.response.data.message==='Validation error: This emId already exists.'){
+            toast.error("This employee Id already exists", {
+              position: "top-right",
+            });
+          }else{
+            toast.error(error.response.data.message, {
+              position: "top-right",
+            });
+          }
+          
+        }
         // history.push("/users"); // Redirect after successful creation
       } catch (error) {
         console.error("Error creating user:", error);
@@ -227,12 +302,12 @@ const AddUser = ({isEditMode = false}) => {
           color="blue-gray"
           className="underline text-3xl text-black md:text-5xl"
         >
-          {isEditMode ? "Update User" : "Add New User"} 
+          {isEditMode ? "Update User" : "Add New User"}
         </Typography>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-6">
-      <div className="flex-auto">
+        <div className="flex-auto">
           <InputField
             label="Full Name"
             name="fullName"
@@ -243,7 +318,6 @@ const AddUser = ({isEditMode = false}) => {
             required
           />
         </div>
-
 
         <div className="flex-auto">
           <PhoneInput
@@ -258,7 +332,7 @@ const AddUser = ({isEditMode = false}) => {
           <InputField
             label="Employee ID"
             name="employeeId"
-            value={formData.fullName.split(" ")[0] + uniqueID}
+            value={formData.fullName.split(" ")[0]+uniqueID}
             onChange={handleChange}
             type="text"
             disabled={true}
@@ -266,16 +340,21 @@ const AddUser = ({isEditMode = false}) => {
         </div>
 
         <div className="flex-auto">
-          <Select2LikeComponent
-            label="Region"
-            options={regions}
-            required={true}
-            value={selectedDepartment}
-            onSelectChange={(option) => {
-              setSelectedDepartment(option);
-              setFormData((prevData) => ({ ...prevData, region: option }));
-            }}
-          />
+          {regions.length > 0 ? (
+            <Select2LikeComponent
+              label="Region"
+              options={regions}
+              required={true}
+              value={selectedRegion}
+              onSelectChange={(option) => {
+                console.log(option.value);
+                setSelectedRegion(option);
+                setFormData((prevData) => ({ ...prevData, region: option.value }));
+              }}
+            />
+          ) : (
+            <p>Loading regions...</p>
+          )}
         </div>
 
         <div className="flex-auto">
@@ -297,10 +376,10 @@ const AddUser = ({isEditMode = false}) => {
             label="Unit"
             options={units}
             required={true}
-            value={selectedBranch}
+            value={selectedUnit}
             onSelectChange={(option) => {
-              setSelectedBranch(option);
-              setFormData((prevData) => ({ ...prevData, unit: option }));
+              setSelectedUnit(option);
+              setFormData((prevData) => ({ ...prevData, unit: option.value }));
             }}
           />
         </div>
@@ -313,20 +392,20 @@ const AddUser = ({isEditMode = false}) => {
             value={selectedUserRole}
             onSelectChange={(option) => {
               setSelectedUserRole(option);
-              setFormData((prevData) => ({ ...prevData, userRole: option }));
+              setFormData((prevData) => ({ ...prevData, userRole: option.value }));
             }}
           />
         </div>
 
         <div className="flex-auto">
           <Select2LikeComponent
-            label="Status"
-            options={status}
+            label="Designation"
+            options={designation}
             required={true}
-            value={selectedLocation}
+            value={selectedDesignation}
             onSelectChange={(option) => {
-              setSelectedLocation(option);
-              setFormData((prevData) => ({ ...prevData, status: option }));
+              setSelectedDesignation(option);
+              setFormData((prevData) => ({ ...prevData, designation: option.value }));
             }}
           />
         </div>
@@ -441,6 +520,40 @@ const AddUser = ({isEditMode = false}) => {
               )}
             </Card>
           </div>
+
+          <div className="mb-4">
+            <Typography variant="h6" color="blue-gray" className="mb-3">
+              Status <span className="text-red-600">*</span>
+            </Typography>
+
+            <Card className="w-full max-w-[20rem]">
+              <List className="flex-row">
+                <ListItem className="p-0">
+                  <label
+                    htmlFor="user-status"
+                    className="flex w-full cursor-pointer items-center px-3 py-2"
+                  >
+                    <ListItemPrefix className="mr-3">
+                      <Checkbox
+                        id="user-status"
+                        name="status"
+                        checked={formData.status}
+                        onChange={handleStatusCheckboxChange}
+                        ripple={false}
+                        className="hover:before:opacity-0"
+                        containerProps={{
+                          className: "p-0",
+                        }}
+                      />
+                    </ListItemPrefix>
+                    <Typography color="blue-gray" className="font-medium">
+                      Active
+                    </Typography>
+                  </label>
+                </ListItem>
+              </List>
+            </Card>
+          </div>
         </div>
       </div>
 
@@ -485,8 +598,7 @@ const AddUser = ({isEditMode = false}) => {
 
 AddUser.propTypes = {
   isEditMode: PropTypes.bool,
-  userData: PropTypes.object
+  userData: PropTypes.object,
 };
-
 
 export default AddUser;

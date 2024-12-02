@@ -1,13 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
-import { Typography } from '@material-tailwind/react';
+import { useState, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
+import { Typography } from "@material-tailwind/react";
 
-const Select2LikeComponent = ({ label, options, value, onSelectChange, multiSelect, required }) => {
+const Select2LikeComponent = ({
+  label,
+  options,
+  value,
+  onSelectChange,
+  required,
+}) => {
   const [isOpen, setIsOpen] = useState(false); // Track if dropdown is open or closed
   const dropdownRef = useRef(null); // Ref to track dropdown element
 
-  const handleOptionClick = (newValue) => {
-    onSelectChange(newValue); // Pass the new value to the parent component
+  const handleOptionClick = (option) => {
+    onSelectChange(option); // Pass the selected option object to the parent
     setIsOpen(false); // Close the dropdown after selection
   };
 
@@ -38,7 +44,7 @@ const Select2LikeComponent = ({ label, options, value, onSelectChange, multiSele
         onClick={toggleDropdown} // Toggle dropdown open/close on click
         className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:outline-none cursor-pointer flex items-center justify-between"
       >
-        <span>{value || `Select ${label}`}</span>
+        <span>{value?.label || `Select ${label}`}</span>
         <div
           className={`transform transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
@@ -68,10 +74,12 @@ const Select2LikeComponent = ({ label, options, value, onSelectChange, multiSele
               key={index}
               onClick={() => handleOptionClick(option)}
               className={`p-2 cursor-pointer hover:bg-gray-100 ${
-                value === option ? 'bg-gray-200 font-semibold text-black-600' : ''
+                value?.value === option.value
+                  ? "bg-gray-200 font-semibold text-black-600"
+                  : ""
               }`}
             >
-              {option}
+              {option.label}
             </li>
           ))}
         </ul>
@@ -83,10 +91,17 @@ const Select2LikeComponent = ({ label, options, value, onSelectChange, multiSele
 // PropTypes validation
 Select2LikeComponent.propTypes = {
   label: PropTypes.string.isRequired,
-  options: PropTypes.arrayOf(PropTypes.string).isRequired,
-  value: PropTypes.string,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.any.isRequired,
+    })
+  ).isRequired, // Expect array of objects with label and value
+  value: PropTypes.shape({
+    label: PropTypes.string,
+    value: PropTypes.any,
+  }), // Selected option should also be an object
   onSelectChange: PropTypes.func.isRequired,
-  multiSelect: PropTypes.bool,
   required: PropTypes.bool,
 };
 

@@ -2,16 +2,22 @@ import http from "../api/auth";
 
 class UserService{
 
-    getAll(page){
-        return http.get(`/api/users?page=${page}&size=10&delay=1`);
+    getAll(page) {
+        const id = localStorage.getItem("Auth");
+        return http.get(`/api/users?page=${page}&size=10`,{
+            headers: {
+                'Authorization': `${id}`
+            }
+        });
     }
+   
 
     get(id){
         return http.get(`/api/users/${id}`);
     }
 
     create(data){
-        return http.post('/users', data);
+        return http.post('/api/auth/signup', data);
     }
 
     update(data){

@@ -20,7 +20,7 @@ var corsOptions = {
 app.use(express.json());
 
 //parse requests of content-type - application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 
 const db = require('./models');
 db.sequelize.sync({alter: false});
@@ -48,6 +48,8 @@ app.get('/protected', auth.verifyToken, (req, res) => {
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/ticket.routes')(app);
+require('./routes/region.routes')(app);
+require('./routes/unit.routes')(app);
 
 
 

@@ -83,6 +83,7 @@ const Test = () => {
   const retrieveUser = async (page) => {
     setLoading(true);
     try {
+      
       const response = await UserService.getAll(page, perPage);
       setData(response.data.data || []);
       setFilteredData(response.data.data || []);
@@ -138,7 +139,8 @@ const Test = () => {
   };
 
   const handleUpdate = (row) => {
-    navigate('/update',{state:{userId: row.id}});
+    console.log("ussssser id",row.emId);
+    navigate('/update',{state:{userId: row.emId}});
     // setSelectedRow(row);
     // setUpdateUserData({
     //   id: row.id,
@@ -199,14 +201,15 @@ const Test = () => {
     setLoading(true);
     try {
       //call the delete API
-      const response = await UserService.delete(selectedRow.id);
+      console.log("delete",selectedRow.emId);
+      const response = await UserService.delete(selectedRow.emId);
       console.log("Delete response: " + response.data.message);
 
       setData((prevData) =>
-        prevData.filter((user) => user.id !== selectedRow.id)
+        prevData.filter((user) => user.emId !== selectedRow.emId)
       );
       setFilteredData((prevData) =>
-        prevData.filter((user) => user.id !== selectedRow.id)
+        prevData.filter((user) => user.emId !== selectedRow.emId)
       );
 
       setDeleteOpen(false);
@@ -236,7 +239,7 @@ const Test = () => {
   const columns = [
     {
       name: "ID",
-      selector: (row) => row.id,
+      selector: (row) => row.emId,
       sortable: true,
     },
     {

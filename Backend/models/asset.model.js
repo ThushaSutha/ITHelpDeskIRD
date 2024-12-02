@@ -31,7 +31,7 @@ module.exports = (sequelize, Sequelize) =>{
             type: Sequelize.INTEGER,
             references:{
                 model: 'users',
-                key: 'id'
+                key: 'emId'
             }
         },
         service_company_id:{

@@ -27,14 +27,14 @@ module.exports = (sequelize, Sequelize)=>{
             type: Sequelize.INTEGER,
             references:{
                 model: 'users',
-                key: 'id'
+                key: 'emId'
             }
         },
         assigned_to:{
             type: Sequelize.INTEGER,
             references:{
                 model: 'users',
-                key: 'id'
+                key: 'emId'
             }
         }
     },{

@@ -1,10 +1,22 @@
 module.exports = (sequelize, Sequelize) => {
     const User = sequelize.define('user', {
-        id: {
+        emId:{
             type: Sequelize.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
+        // emId: {
+        //     type: Sequelize.STRING,
+        //     validate: {
+        //         isUnique: async function (value) {
+        //             const existing = await User.findOne({ where: { emId: value } });
+        //             if (existing) {
+        //                 throw new Error('This emId already exists.');
+        //             }
+        //         },
+        //     },
+
+        // },
         name: {
             type: Sequelize.STRING(255),
             allowNull: false
@@ -16,7 +28,24 @@ module.exports = (sequelize, Sequelize) => {
                 isEmail: true
             }
         },
-        role:{
+        contact: {
+            type: Sequelize.STRING, // Changed to STRING for better handling of phone numbers
+            allowNull: false,
+            
+        },
+        designation: {
+            type: Sequelize.STRING(255),
+            allowNull: false
+        },
+        firstLogin: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
+        },
+        setExpiryDate: {
+            type: Sequelize.DATEONLY,
+            allowNull: true
+        },
+        role: {
             type: Sequelize.STRING(20),
             allowNull: false,
             defaultValue: 'staff'
@@ -29,7 +58,6 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.TINYINT,
             allowNull: false,
             defaultValue: 0
-
         },
         unit_id: {
             type: Sequelize.INTEGER,
@@ -41,7 +69,7 @@ module.exports = (sequelize, Sequelize) => {
         serial_number: {
             type: Sequelize.STRING,
             references: {
-                model: 'assets', 
+                model: 'assets',
                 key: 'serial_number'
             }
         }
@@ -57,7 +85,7 @@ module.exports = (sequelize, Sequelize) => {
 
     // Define Associations
     User.associate = models => {
-        User.belongsTo(models.Unit, { foreignKey: 'unit_id', as: 'department' });
+        User.belongsTo(models.Unit, { foreignKey: 'unit_id', as: 'units' });
         User.hasMany(models.Asset, { foreignKey: 'serial_number', as: 'assets' });
     };
 

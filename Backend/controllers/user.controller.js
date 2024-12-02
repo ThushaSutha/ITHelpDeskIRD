@@ -1,5 +1,6 @@
 const { where } = require("sequelize");
 const db = require("../models");
+const { encrypt, decrypt } = require("../helper/helper");
 const User = db.user;
 const Op = db.Sequelize.Op;
 
@@ -24,18 +25,29 @@ exports.getUsers = async (req,res) => {
     const { page = 1 , size = 5 } = req.query;
     const limit = +size;
     const offset = (page - 1) * size;
-    
-    
-    var condition = name ? { name: { [Op.like]: `%${name}%` } }  : 
-    email ? { email: { [Op.like]: `%${email}%` } } : null;
+
+    const id = req.headers['x-auth-id'];
+    const iv = req.headers['x-auth-iv'];
+    console.log("id",id);
+
+
+
+    // Ensure both are provided
+    if (!id || !iv) {
+        return res.status(400).send({ message: "Missing authentication token or IV",iv});
+    }
 
     try {
+        const decryptId =   decrypt(id,iv);
+        var condition = name ? { name: { [Op.like]: `%${name}%` } }  : 
+    email ? { email: { [Op.like]: `%${email}%` } } : id ? { emId: { [Op.notLike]: `%${decryptId}%` } } : null;
         const users = await User.findAndCountAll({ 
             where: condition, 
             attributes: { exclude: ['password'] } ,
             limit: limit,
             offset: offset
         });
+        console.log(users.row);
         res.status(200).send({
             message: "Users retrieved successfully",
             data: users.rows,
@@ -85,7 +97,7 @@ exports.update = async (req,res) => {
     const id = req.params.id;
 
     User.update(req.body,{
-        where: { id: id },
+        where: { emId: id },
     }).then(num => {
         if (num == 1) {
             res.status(200).send({
@@ -108,7 +120,7 @@ exports.delete = async (req,res) => {
     const id = req.params.id;
 
     User.destroy({
-        where: { id: id }
+        where: { emId: id }
     }).then(num =>{
         if (num == 1) {
             res.status(200).send({

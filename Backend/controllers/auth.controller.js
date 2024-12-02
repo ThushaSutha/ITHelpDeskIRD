@@ -1,5 +1,6 @@
 const db = require("../models");
 const config = require("../config/auth.config");
+const { encrypt, decrypt } = require("../helper/helper")
 const User = db.user;
 
 const Op = db.Sequelize.Op;
@@ -10,12 +11,17 @@ var bcrypt = require("bcryptjs");
 exports.signup = (req, res) => {
     const hashedPassword = bcrypt.hashSync(req.body.password, 8);
     User.create({
+        emId:req.body.emId,
         name: req.body.name,
         email: req.body.email,
         password: hashedPassword, 
         role: req.body.role,
+        contact: req.body.phone,
+        designation: req.body.designation,
         status: req.body.status,
-        unit_id: req.body.unit_id
+        unit_id: req.body.unit,
+        firstLogin: req.body.firstLogin,
+        setExpiryDate: req.body.setExpiryDate
     })
     .then(user => {
         res.status(201).send({
@@ -49,20 +55,25 @@ exports.signin = async (req, res) => {
             return res.status(401).send({ accessToken: null, message: "Invalid Password!" });
         }
 
-        const token = jwt.sign({ id: user.id }, config.secret, {
+        const token = jwt.sign({ id: user.emId }, config.secret, {
             algorithm: 'HS256',
             expiresIn: 3600, // 1 hour
         });
 
-        const unit = await user.getUnit();
+        const unit = await user.getUnits();
+        const region = await unit.getRegion();
         console.log(unit);
+
+        const { encryptedData, iv } = encrypt(user.emId.toString());
         
         res.status(200).send({
-            id: user.id,
+            emId: encryptedData,
+            iv: iv,
             name: user.name,
             email: user.email,
             role: user.role,
             unit: unit ? unit.name : null,
+            region: region ? region.name : null,
             accessToken: token,
         });
     } catch (err) {

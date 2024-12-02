@@ -12,6 +12,8 @@ const LogoutButton = () => {
     setIsLoading(true);
     setTimeout(() => {
       localStorage.removeItem("token");
+      localStorage.removeItem("Auth");
+      localStorage.removeItem("AuthIv");
       setRedirectPath(null);
       navigate("/signIn");
     }, 1000);

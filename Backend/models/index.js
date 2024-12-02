@@ -32,8 +32,12 @@ db.asset = require("../models/asset.model")(sequelize, Sequelize);
 
 
 //relationship list 
-db.unit.hasMany(db.user,{foreignKey: 'id'});
-db.user.belongsTo(db.unit,{foreignKey: 'unit_id'});
+db.region.hasMany(db.unit, { foreignKey: "region_id" });
+db.unit.belongsTo(db.region,{ foreignKey: 'region_id' ,as : 'region' });
+
+db.unit.hasMany(db.user, { foreignKey: 'unit_id', as: 'users' }); // A Unit can have many Users
+db.user.belongsTo(db.unit, { foreignKey: 'unit_id', as: 'units' }); // A User belongs to a Unit
+
 
 //ticket table relationship
 // db.user.hasMany(db.ticket,{foreignKey: 'user_id'});

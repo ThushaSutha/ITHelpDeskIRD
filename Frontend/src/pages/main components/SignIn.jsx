@@ -27,9 +27,12 @@ function SignInForm() {
     }
     try {
       const { data } = await api.post('/api/auth/signin', { email, password });
+      console.log("token"+data.email);
             localStorage.setItem('token', data.accessToken);
-            localStorage.setItem('Auth',data);
-            console.log("token"+data.accessToken);
+            
+            localStorage.setItem('Auth',data.emId);
+            localStorage.setItem('AuthIv',data.iv);
+            
             
             
       toast.success("Login successful!", {
