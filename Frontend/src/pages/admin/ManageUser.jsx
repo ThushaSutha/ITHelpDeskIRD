@@ -53,6 +53,7 @@ const Test = () => {
     email: "",
     role: "",
     unit_id: "",
+    contact:""
   });
   const [selectUnit, setUnitOption] = useState("");
   const [selectStatus, setStatusOption] = useState("");
@@ -150,7 +151,7 @@ const Test = () => {
     //   unit_id: row.unit_id || "",
     // });
     // setUpdateOpen(!updateOpen);
-    console.log("Update clicked for row:", row.id);
+    console.log("Update clicked for row:", row.emId);
   };
 
   //Handle changes in update form fields

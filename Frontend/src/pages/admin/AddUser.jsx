@@ -46,6 +46,7 @@ const AddUser = ({ isEditMode = false }) => {
   const designation = [
     { value: "HR", label: "HR" },
     { value: "IT staff", label: "IT Staff" },
+    { value: "Account", label: "Account" }
   ];
 
   const [formData, setFormData] = useState({
@@ -60,6 +61,7 @@ const AddUser = ({ isEditMode = false }) => {
     designation: "",
     temporaryPassword: "",
     confirmPassword: "",
+    password: !isEditMode ? true : false,
     passwordExpiry: {
       firstLogin: false,
       setExpiryDate: false,
@@ -88,25 +90,25 @@ const AddUser = ({ isEditMode = false }) => {
 
   
   //fetch user data
-  const retrieveUser = async (id) => {
-    try {
-      const response = await userService.get(id);
-      console.log("Fetched user data:", response.data.data);
-      // setData(response.data.data); // Store only the relevant data4
-      setFormData({
-        ...formData,
-        fullName: response.data.data.name,
-        email: response.data.data.email,
-        phoneNumber: response.data.data.phone,
-        userRole: response.data.data.role,
-        region: response.data.data.region,
-        unit: response.data.data.unit,
-        status: response.data.data.status,
-      });
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
+  // const retrieveUser = async (id) => {
+  //   try {
+  //     const response = await userService.get(id);
+  //     console.log("Fetched user data:", response.data.data);
+  //     // setData(response.data.data); // Store only the relevant data4
+  //     setFormData({
+  //       ...formData,
+  //       fullName: response.data.data.name,
+  //       email: response.data.data.email,
+  //       phoneNumber: response.data.data.contact,
+  //       userRole: response.data.data.role,
+  //       region: response.data.data.region,
+  //       unit: response.data.data.unit,
+  //       status: response.data.data.status,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error fetching user data:", error);
+  //   }
+  // };
 
   //fetch region data
   const retrieveRegion = async () => {
@@ -144,9 +146,97 @@ const AddUser = ({ isEditMode = false }) => {
 
   useEffect(() => {
     if (isEditMode) {
-      retrieveUser(userId);
+      const retrieveUser = async () => {
+        try {
+          const response = await userService.get(userId);
+          console.log("Fetched user data:", response.data.data);
+
+          //set user unit 
+          const userUnit = response.data.data.unit_id;
+          if (units.length > 0) {
+            const matchingUnit = units.find((unit) => unit.value === userUnit);
+            console.log('Matching unit:', matchingUnit);
+            if (matchingUnit) {
+                console.log('Setting state...');
+                setSelectedUnit(matchingUnit);
+                setFormData((prevData) => ({
+                    ...prevData,
+                    unit: matchingUnit.value,
+                }));
+            }
+        }
+
+        //set user role
+        const userRole = response.data.data.role;
+          if (role.length > 0) {
+            const matchingRole = role.find((role) => role.value === userRole);
+            console.log('Matching role:', matchingRole);
+            if (matchingRole) {
+                console.log('Setting state...');
+                setSelectedUserRole(matchingRole);
+                setFormData((prevData) => ({
+                    ...prevData,
+                    userRole: matchingRole.value,
+                }));
+            }
+        }
+
+        //set designation
+        const userDesignation = response.data.data.designation;
+          if (designation.length > 0) {
+            const matchingDesignation = designation.find((designation) => designation.value === userDesignation);
+            console.log('Matching designation:', matchingDesignation);
+            console.log('Matching userDesignation:', matchingDesignation);
+            if (matchingDesignation) {
+                console.log('Setting state...');
+                setSelectedDesignation(matchingDesignation);
+                setFormData((prevData) => ({
+                    ...prevData,
+                    designation: matchingDesignation.value,
+                }));
+            }
+        }
+
+        console.log("status",response.data.data.status);
+        if(response.data.data.firstLogin){
+          setFormData((prevData) => ({
+            ...prevData,
+            passwordExpiry: {
+              ...prevData.passwordExpiry,
+              firstLogin: response.data.data.firstLogin,
+            },
+
+          }));
+        }else{
+          setFormData((prevData) => ({
+            ...prevData,
+            passwordExpiry: {
+              ...prevData.passwordExpiry,
+              setExpiryDate: response.data.data.setExpiryDate
+            },
+
+          }));
+        }
+
+        setFormData((prevData) => ({
+          ...prevData,
+          fullName: response.data.data.name,
+          email: response.data.data.email,
+          phoneNumber: response.data.data.contact,
+          userRole: response.data.data.role,
+          status: response.data.data.status,
+        }));
+          
+          
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      };
+
+      retrieveUser();
     }
-  }, [isEditMode, userId]);
+
+  }, [isEditMode, userId,units]);
 
   useEffect(() => {
     retrieveRegion();
@@ -194,6 +284,14 @@ const AddUser = ({ isEditMode = false }) => {
     }));
   };
 
+  const handlePasswordCheckboxChange = (e) => {
+    const { checked } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      password: checked,
+    }));
+  };
+
   const handleStatusCheckboxChange = (e) => {
     const { checked } = e.target;
     setFormData((prevData) => ({
@@ -221,15 +319,7 @@ const AddUser = ({ isEditMode = false }) => {
     );
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   if (formData.temporaryPassword !== formData.confirmPassword) {
-  //     setPasswordError("Passwords do not match");
-  //     return;
-  //   }
 
-  //   console.log(formData);
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -238,8 +328,10 @@ const AddUser = ({ isEditMode = false }) => {
       return;
     }
 
+    
+
     const userPayload = {
-      emId: formData.fullName+uniqueID,
+      ...(isEditMode && { id: userId }),
       name: formData.fullName,
       email: formData.email,
       phone: formData.phoneNumber,
@@ -247,16 +339,32 @@ const AddUser = ({ isEditMode = false }) => {
       unit: formData.unit,
       status: formData.status,
       designation: formData.designation,
-      password: formData.temporaryPassword,
+      ...(formData.password && { password: formData.temporaryPassword }), // Only include password if it's set
       firstLogin: formData.passwordExpiry.firstLogin,
-      setExpiryDate: formData.passwordExpiry.setExpiryDate
+      ...(!formData.firstLogin && {
+        setExpiryDate: formData.passwordExpiry.expiryDate,
+      }),
+      // expiryDate: formData.passwordExpiry.expiryDate
     };
+    
 
     if (isEditMode) {
       try {
         // await userService.update(userId, userPayload);
-        console.log("User updated successfully!", userPayload);
+        // console.log("User updated successfully!", userPayload);
         // history.push("/users"); // Redirect after successful update
+        try {
+          const response = await userService.update(userPayload);
+          toast.success(response.data.message, {
+            position: "top-right",
+          });
+          navigate("/users");
+          console.log(userPayload);
+          console.log(response.data.message);
+        } catch (error) {
+          console.log(userPayload);
+          console.log(error);
+        }
       } catch (error) {
         console.error("Error updating user:", error);
       }
@@ -295,8 +403,6 @@ const AddUser = ({ isEditMode = false }) => {
 
   return (
     <form onSubmit={handleSubmit} className="p-6 bg-card rounded-lg shadow-md">
-      {/* <h2 className="text-lg font-semibold mb-4">Add New User</h2> */}
-
       <div className=" mb-6 ">
         <Typography
           color="blue-gray"
@@ -328,7 +434,7 @@ const AddUser = ({ isEditMode = false }) => {
           />
         </div>
 
-        <div className="flex-auto">
+        {/* <div className="flex-auto">
           <InputField
             label="Employee ID"
             name="employeeId"
@@ -337,7 +443,7 @@ const AddUser = ({ isEditMode = false }) => {
             type="text"
             disabled={true}
           />
-        </div>
+        </div> */}
 
         <div className="flex-auto">
           {regions.length > 0 ? (
@@ -409,10 +515,42 @@ const AddUser = ({ isEditMode = false }) => {
             }}
           />
         </div>
+        <div className="flex-auto">
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6">
           <h1 className="text-lg font-semibold mt-5 mb-2">Account Settings</h1>
-          <div className="flex-auto">
+
+          {isEditMode &&(
+            <>
+            <label
+                    htmlFor="password"
+                    className="flex w-full cursor-pointer items-center px-3 py-2"
+                  >
+                    <ListItemPrefix className="mr-3">
+                      <Checkbox
+                        id="password"
+                        name="password"
+                        checked={formData.password}
+                        onChange={handlePasswordCheckboxChange}
+                        ripple={false}
+                        className="hover:before:opacity-0"
+                        containerProps={{
+                          className: "p-0",
+                        }}
+                      />
+                    </ListItemPrefix>
+                    <Typography color="blue-gray" className="font-medium">
+                      Change Password
+                    </Typography>
+                  </label>
+            <Card className="w-full max-w-[62rem]">
+              
+              {/* Conditional rendering of the date picker */}
+              {formData.password&& (
+                <>
+                <div className="p-5">
+                  <div className="flex-auto">
             <InputField
               label="Temporary Password"
               name="temporaryPassword"
@@ -440,6 +578,49 @@ const AddUser = ({ isEditMode = false }) => {
             )}{" "}
             {/* Display error */}
           </div>
+          </div>
+                  
+                </>
+              )}
+            </Card>
+            </>
+          )}
+
+          {!isEditMode && (
+            <>
+            <div className="flex-auto">
+            <InputField
+              label="Temporary Password"
+              name="temporaryPassword"
+              value={formData.temporaryPassword}
+              onChange={handleChange}
+              placeholder="e.g., **********"
+              type="password"
+              pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+              required={true}
+            />
+          </div>
+
+          <div className="flex-auto">
+            <InputField
+              label="Confirm Password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="e.g., **********"
+              type="password"
+              required={true}
+            />
+            {passwordError && (
+              <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+            )}{" "}
+            {/* Display error */}
+          </div>
+            </>
+          )}
+
+            
+          
 
           <div className="mb-4">
             <Typography variant="h6" color="blue-gray" className="mb-3">

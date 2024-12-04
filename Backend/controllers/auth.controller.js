@@ -11,7 +11,6 @@ var bcrypt = require("bcryptjs");
 exports.signup = (req, res) => {
     const hashedPassword = bcrypt.hashSync(req.body.password, 8);
     User.create({
-        emId:req.body.emId,
         name: req.body.name,
         email: req.body.email,
         password: hashedPassword, 
@@ -27,7 +26,7 @@ exports.signup = (req, res) => {
         res.status(201).send({
             message: "User was created successfully!",
             user: {
-                id: user.user_id,
+                id: user.emId,
                 name: user.name,
                 email: user.email,
                 role: user.role

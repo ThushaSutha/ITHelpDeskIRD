@@ -93,27 +93,41 @@ exports.findOne = async (req,res) => {
 };
 
 //update a user by the id in the request
-exports.update = async (req,res) => {
+const bcrypt = require('bcryptjs'); // Assuming you're using bcrypt for hashing
+
+exports.update = async (req, res) => {
     const id = req.params.id;
 
-    User.update(req.body,{
-        where: { emId: id },
-    }).then(num => {
-        if (num == 1) {
+    // Destructure the body
+    let { password, passwordStatus, ...updateData } = req.body;
+
+    // If password is provided, hash it before saving
+    if (password) {
+        const hashedPassword = await bcrypt.hash(password, 10); // Hash password with salt rounds of 10
+        updateData.password = hashedPassword; // Add hashed password to updateData
+    }
+
+    try {
+        const [num] = await User.update(updateData, {
+            where: { emId: id }
+        });
+
+        if (num === 1) {
             res.status(200).send({
                 message: "User was updated successfully"
             });
-        }else{
+        } else {
             res.status(404).send({
                 message: "Cannot update User. Maybe User was not found"
             });
         }
-    }).catch(err =>{
+    } catch (err) {
         res.status(500).send({
             message: err.message || "Error updating User"
         });
-    });
+    }
 }
+
 
 //delete a user with the specified id in the request
 exports.delete = async (req,res) => {
