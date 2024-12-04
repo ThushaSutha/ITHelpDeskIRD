@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import serverIllustrationImageSrc from "../../images/ticket.png";
@@ -9,12 +9,16 @@ import Toast from "../../components/common/Toast";
 import api from "../../api/auth"
 import { redirectTo } from "../../utils/helpers";
 import { useRedirect } from "../../contexts/RedirectContext";
+import { userContext  } from '../../contexts/ContextProvider';
+
 
 function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { redirectPath, setRedirectPath } = useRedirect();
+  const { login } = useContext(userContext);
+  
   
 
   const Auth = async (e) => {
@@ -27,8 +31,11 @@ function SignInForm() {
     }
     try {
       const { data } = await api.post('/api/auth/signin', { email, password });
-      console.log("token"+data.email);
+            
+            // role(role);
+
             localStorage.setItem('token', data.accessToken);
+            localStorage.setItem('userRole',data.role);
             
             localStorage.setItem('Auth',data.emId);
             localStorage.setItem('AuthIv',data.iv);
@@ -38,11 +45,16 @@ function SignInForm() {
       toast.success("Login successful!", {
         position: "top-right",
       });
+
+
+
       if(data.role === 'admin'){
+        // login('admin');
         const path = redirectPath || "/users";
         setRedirectPath(null); // Clear the stored path after use
         navigate(path);
       }else{
+        // login('staff');
         const path = redirectPath || "/dashboard";
         console.log(path);
         setRedirectPath(null); // Clear the stored path after use

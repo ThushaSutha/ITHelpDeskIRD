@@ -5,7 +5,7 @@ import App from './App.jsx'
 import { ThemeProvider } from "@material-tailwind/react";
 
 import { RedirectProvider } from './contexts/RedirectContext.jsx';
-import { ContextProvider } from './contexts/ContextProvider.jsx';
+import { UserProvider } from './contexts/ContextProvider.jsx';
 
 
 
@@ -14,9 +14,9 @@ createRoot(document.getElementById('root')).render(
     <ThemeProvider>
       
       <RedirectProvider>
-        <ContextProvider>
+        <UserProvider>
         <App />
-        </ContextProvider>
+        </UserProvider>
       
       
       </RedirectProvider>
