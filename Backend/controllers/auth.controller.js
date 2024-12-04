@@ -20,7 +20,8 @@ exports.signup = (req, res) => {
         status: req.body.status,
         unit_id: req.body.unit,
         firstLogin: req.body.firstLogin,
-        setExpiryDate: req.body.setExpiryDate
+        setExpiryDate: req.body.setExpiryDate,
+        employeeId: req.body.employeeId
     })
     .then(user => {
         res.status(201).send({

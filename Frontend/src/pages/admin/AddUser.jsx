@@ -225,6 +225,14 @@ const AddUser = ({ isEditMode = false }) => {
           phoneNumber: response.data.data.contact,
           userRole: response.data.data.role,
           status: response.data.data.status,
+          employeeId: response.data.data.employeeId,
+          passwordExpiry: {
+            expiryDate: response.data.data.setExpiryDate,
+            firstLogin: response.data.data.firstLogin,
+            setExpiryDate: !response.data.data.firstLogin ? true : false,
+
+          },
+
         }));
           
           
@@ -337,6 +345,7 @@ const AddUser = ({ isEditMode = false }) => {
       phone: formData.phoneNumber,
       role: formData.userRole,
       unit: formData.unit,
+      employeeId: formData.employeeId,
       status: formData.status,
       designation: formData.designation,
       ...(formData.password && { password: formData.temporaryPassword }), // Only include password if it's set
@@ -434,16 +443,16 @@ const AddUser = ({ isEditMode = false }) => {
           />
         </div>
 
-        {/* <div className="flex-auto">
+        <div className="flex-auto">
           <InputField
             label="Employee ID"
             name="employeeId"
-            value={formData.fullName.split(" ")[0]+uniqueID}
+            value={formData.employeeId}
             onChange={handleChange}
             type="text"
-            disabled={true}
+            
           />
-        </div> */}
+        </div>
 
         <div className="flex-auto">
           {regions.length > 0 ? (
@@ -515,8 +524,7 @@ const AddUser = ({ isEditMode = false }) => {
             }}
           />
         </div>
-        <div className="flex-auto">
-        </div>
+        
 
         <div className="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6">
           <h1 className="text-lg font-semibold mt-5 mb-2">Account Settings</h1>

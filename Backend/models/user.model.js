@@ -5,6 +5,10 @@ module.exports = (sequelize, Sequelize) => {
             primaryKey: true,
             autoIncrement: true
         },
+        employeeId:{
+            type:Sequelize.STRING(255),
+            allowNull: false
+        },
         // emId: {
         //     type: Sequelize.STRING,
         //     validate: {
