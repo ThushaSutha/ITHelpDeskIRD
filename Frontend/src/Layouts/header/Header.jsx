@@ -7,10 +7,13 @@ import LogoutButton from '../../components/common/LogoutButton';
 const Header = () => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const token = localStorage.getItem('token');
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
+  const role = localStorage.getItem("userRole");
 
   return (
     <header className="p-6 shadow-lg bg-gray-900  w-full top-0 z-10">
@@ -24,6 +27,11 @@ const Header = () => {
     {/* Navigation Links for Desktop */}
     <nav className="hidden lg:flex space-x-8 ml-auto">
       <Link to="/" className="text-gray-300 hover:text-white transition duration-300">Home</Link>
+      {token != null ?(
+        <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">Dashboard</Link>
+      ):(
+        ""
+      )}
       {location.pathname === '/' ? (
         <>
           <a href="#" className="text-gray-300 hover:text-white transition duration-300">FAQ</a>
@@ -38,18 +46,22 @@ const Header = () => {
         </>
       ) : (
         <>
-          <Link to="/dashboard/my-ticket" className="text-gray-300 hover:text-white transition duration-300">My Ticket</Link>
-          <Link to="/dashboard/create-ticket" className="text-gray-300 hover:text-white transition duration-300">Create Ticket</Link>
-          <a href="#" className="text-gray-300 hover:text-white transition duration-300">Contact</a>
-          <a href="#" className="text-gray-300 hover:text-white transition duration-300">FAQ</a>
-          <LogoutButton />
-          {/* <Link
-            to="/"
-            className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition duration-300"
-          >
-            Logout
-          </Link> */}
-        </>
+  {role === "admin" ? (
+    <>
+      <Link to="/users" className="text-gray-300 hover:text-white transition duration-300">Manage Users</Link>
+      <Link to="/tickets" className="text-gray-300 hover:text-white transition duration-300">Manage Tickets</Link>
+      
+    </>
+  ) : (
+    <>
+      <Link to="/dashboard/my-ticket" className="text-gray-300 hover:text-white transition duration-300">My Ticket</Link>
+      <Link to="/dashboard/create-ticket" className="text-gray-300 hover:text-white transition duration-300">Create Ticket</Link>
+    </>
+  )}
+  <a href="#" className="text-gray-300 hover:text-white transition duration-300">Contact</a>
+  <a href="#" className="text-gray-300 hover:text-white transition duration-300">FAQ</a>
+  <LogoutButton />
+</>
       )}
     </nav>
 

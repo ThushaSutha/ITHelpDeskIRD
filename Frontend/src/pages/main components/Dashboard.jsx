@@ -2,17 +2,29 @@ import { useParams } from "react-router-dom";
 
 import NewTicket from "./NewTicket";
 import MyTicket from "./MyTicket";
+import AdminDashboard from "../admin/Dashboard"
 
 function Dashboard() {
   // Get the current route parameter (either 'my-ticket' or 'create-ticket')
   const { view } = useParams();
+  const role = localStorage.getItem("userRole");
 
   return (
     <>
-      {/* Display dynamic content based on the current route */}
-
+      {role === "admin" ? (
+        <>
+      <AdminDashboard />
+      
+    </>
+  ) : (
+    <>
       {!view || view === "my-ticket" ? <MyTicket /> : null}
       {view === "create-ticket" && <NewTicket />}
+      </>
+  )}
+
+
+      
     </>
   );
 }

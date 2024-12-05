@@ -6,6 +6,7 @@ import LordDeleteIconComponent from "../../components/Icons/LordDeleteIconCompon
 import { Card, CardFooter, Chip, Typography } from "@material-tailwind/react";
 import { Spinner } from "@material-tailwind/react";
 import Avatar from "react-avatar";
+import { format } from "date-fns";
 
 import {
   MagnifyingGlassIcon,
@@ -33,7 +34,7 @@ import {
 import "../../styles/style.css";
 import InputField from "../../components/common/InputField";
 import Select2LikeComponent from "../../components/common/Select2LikeComponent";
-import { Link, useNavigate  } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Test = () => {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ const Test = () => {
     email: "",
     role: "",
     unit_id: "",
-    contact:""
+    contact: "",
   });
   const [selectUnit, setUnitOption] = useState("");
   const [selectStatus, setStatusOption] = useState("");
@@ -84,7 +85,6 @@ const Test = () => {
   const retrieveUser = async (page) => {
     setLoading(true);
     try {
-      
       const response = await UserService.getAll(page, perPage);
       setData(response.data.data || []);
       setFilteredData(response.data.data || []);
@@ -140,8 +140,8 @@ const Test = () => {
   };
 
   const handleUpdate = (row) => {
-    console.log("ussssser id",row.emId);
-    navigate('/update',{state:{userId: row.emId}});
+    console.log("ussssser id", row.emId);
+    navigate("/update", { state: { userId: row.emId } });
     // setSelectedRow(row);
     // setUpdateUserData({
     //   id: row.id,
@@ -202,7 +202,7 @@ const Test = () => {
     setLoading(true);
     try {
       //call the delete API
-      console.log("delete",selectedRow.emId);
+      console.log("delete", selectedRow.emId);
       const response = await UserService.delete(selectedRow.emId);
       console.log("Delete response: " + response.data.message);
 
@@ -239,9 +239,10 @@ const Test = () => {
   // Define columns
   const columns = [
     {
-      name: "ID",
-      selector: (row) => row.emId,
-      sortable: true,
+      name: "#",
+      cell: (row,index) =>(
+        <span>{index + 1}</span>
+      ),
     },
     {
       name: "Profile",
@@ -265,7 +266,9 @@ const Test = () => {
     },
     {
       name: "Role",
-      selector: (row) => row.role,
+      selector: (row) => row.role.split("_") // Split by underscores
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+      .join(" "),
     },
     // {
     //   name: "Serial Number",
@@ -283,8 +286,8 @@ const Test = () => {
       ),
     },
     {
-      name: "Unit ID",
-      selector: (row) => row.unit_id,
+      name: "Created At",
+      selector: (row) => format(new Date(row.createdAt), "dd MMM yyyy, hh:mm a"),
     },
     {
       name: "Actions",
@@ -331,15 +334,11 @@ const Test = () => {
               </Typography>
             </div>
             <div className="basis-1/12 ">
-            <Link to="/add">
-              <Button
-                className="flex  items-center "
-                size="sm"
-              >
-                
-                <UserPlusIcon className="h-6 w-6 text-white" />
-                Add User
-              </Button>
+              <Link to="/add">
+                <Button className="flex  items-center " size="sm">
+                  <UserPlusIcon className="h-6 w-6 text-white" />
+                  Add User
+                </Button>
               </Link>
             </div>
           </div>
@@ -395,137 +394,106 @@ const Test = () => {
       {/* View Modal code */}
 
       <Dialog
-        size="xs"
-        open={viewOpen}
-        handler={handleOpen}
-        className="bg-transparent shadow-none"
-      >
-        <Card className="mx-auto w-full max-w-[24rem]">
-          <CardBody className="flex flex-col gap-4">
-            <Typography variant="h4" color="blue-gray">
-              User Details
+  size="xs"
+  open={viewOpen}
+  handler={handleOpen}
+  className="bg-transparent shadow-none"
+>
+<DialogBody className="xs:h-[42rem] sm:h-full xs:overflow-auto sm:overflow-hidden">
+  <Card className="mx-auto w-full max-w-lg lg:max-w-2xl">
+    <CardBody className="flex flex-col gap-4">
+      <Typography variant="h4" color="blue-gray" className="flex justify-center">
+        User Details
+      </Typography>
+      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-3 gap-4">
+        {/* Left Section: Avatar */}
+        <div className="grid grid-rows-2 gap-5 justify-items-center bg-gradient-to-t from-deep-orange-500 to-deep-orange-100 rounded-lg">
+          <Avatar
+            name={selectedRow?.name}
+            size="100"
+            className="mt-5 rounded-full"
+          />
+          <div className="grid justify-items-center">
+            <Typography variant="h5" className="text-white">
+              {selectedRow?.name}
+              <div className="grid text-sm justify-center">
+              {selectedRow?.designation}
+              </div>
             </Typography>
-            <div className="flex  justify-center gap-4">
-              <Avatar name={selectedRow?.name} size="100" round={true} />
+            <Typography variant="h6" className="text-white">
+              
+            </Typography>
+          </div>
+        </div>
+
+        {/* Right Section: Details */}
+        <div className="col-span-2">
+          <div className="ml-5">
+            {/* Personal Details */}
+            <div className="flex justify-center">Personal</div>
+            <hr className="border-t-2 border-gray-300 mb-4" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <Typography variant="h6">Employee Id</Typography>
+                {selectedRow?.employeeId}
+              </div>
+              <div>
+                <Typography variant="h6">Email</Typography>
+                {selectedRow?.email}
+              </div>
+              <div>
+                <Typography variant="h6">Contact No</Typography>
+                {selectedRow?.contact}
+              </div>
+              <div>
+                <Typography variant="h6">Role</Typography>
+                {selectedRow?.role
+                  .split("_")
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(" ")}
+              </div>
             </div>
-            <Typography className="-mb-2" variant="h6">
-              Name : {selectedRow?.name}
-            </Typography>
-            <Typography className="-mb-2" variant="h6">
-              Email: {selectedRow?.email}
-            </Typography>
-            <Typography className="-mb-2" variant="h6">
-              Role: {selectedRow?.role}
-            </Typography>
-            <Typography className="-mb-2" variant="h6">
-              Unit: {selectedRow?.unit_id}
-            </Typography>
-            <Typography className="-mb-2" variant="h6">
-              Region: {selectedRow?.unit_id}
-            </Typography>
-          </CardBody>
-          <CardFooter className="pt-0">
-            <Button variant="gradient" onClick={handleOpen} fullWidth>
-              Close
-            </Button>
-          </CardFooter>
-        </Card>
-      </Dialog>
 
-      {/* New dialog code  */}
-      <Dialog
-        size="xs"
-        open={newOpen}
-        handler={handleNewOpen}
-        className="bg-transparent shadow-none"
-      >
-        <Card className="mx-auto w-full max-w-[24rem]">
-          <CardBody className="flex flex-col gap-4">
-            <Typography variant="h4" color="blue-gray">
-              Update User Details
-            </Typography>
+            {/* Location Details */}
+            <div className="flex justify-center mt-5">Location</div>
+            <hr className="border-t-2 border-gray-300 mb-4" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <Typography variant="h6">Region</Typography>
+                {selectedRow?.region_id}
+              </div>
+              <div>
+                <Typography variant="h6">Unit</Typography>
+                {selectedRow?.unit_id}
+              </div>
+            </div>
 
-            <InputField label="Name" name="name" />
-            <InputField label="Email" name="email" />
-            <InputField label="Role" name="role" />
-            <InputField label="Unit ID" name="unit_id" />
+            {/* Asset Details */}
+            <div className="flex justify-center mt-5">Asset</div>
+            <hr className="border-t-2 border-gray-300 mb-4" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <Typography variant="h6">Name</Typography>
+                {selectedRow?.region_id}
+              </div>
+              <div>
+                <Typography variant="h6">Serial Number</Typography>
+                {selectedRow?.serial_number}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </CardBody>
+    <CardFooter className="pt-0">
+      <Button variant="gradient" onClick={handleOpen} fullWidth>
+        Close
+      </Button>
+    </CardFooter>
+  </Card>
+  </DialogBody>
+</Dialog>
 
-            <Select2LikeComponent
-              label="Unit"
-              options={units}
-              required={true}
-              value={selectUnit}
-              onSelectChange={handleUnitChange}
-            />
-            {/* status */}
-
-            <Select2LikeComponent
-              label="Status"
-              options={status}
-              required={true}
-              value={selectStatus}
-              onSelectChange={handleStatusChange}
-            />
-
-            {/* password */}
-
-            {/* confirm password */}
-          </CardBody>
-          <CardFooter className="pt-0">
-            <Button variant="gradient" fullWidth>
-              {loading ? <Spinner className="h-5 w-5" /> : "Update"}
-            </Button>
-          </CardFooter>
-        </Card>
-      </Dialog>
-
-      {/* update dialog code  */}
-      <Dialog
-        size="xs"
-        open={updateOpen}
-        handler={updateHandleOpen}
-        className="bg-transparent shadow-none"
-      >
-        <Card className="mx-auto w-full max-w-[24rem]">
-          <CardBody className="flex flex-col gap-4">
-            <Typography variant="h4" color="blue-gray">
-              Update User Details
-            </Typography>
-
-            <InputField
-              label="Name"
-              name="name"
-              value={updateUserData.name}
-              onChange={handleInputChange}
-            />
-
-            <InputField
-              label="Email"
-              name="email"
-              value={updateUserData.email}
-              onChange={handleInputChange}
-            />
-            <InputField
-              label="Role"
-              name="role"
-              value={updateUserData.role}
-              onChange={handleInputChange}
-            />
-            <InputField
-              label="Unit ID"
-              name="unit_id"
-              value={updateUserData.unit_id}
-              onChange={handleInputChange}
-              type="number"
-            />
-          </CardBody>
-          <CardFooter className="pt-0">
-            <Button variant="gradient" onClick={handleUpdateUser} fullWidth>
-              {loading ? <Spinner className="h-5 w-5" /> : "Update"}
-            </Button>
-          </CardFooter>
-        </Card>
-      </Dialog>
 
       {/* delete modal */}
       <Dialog open={deleteOpen} size="xs" handler={deleteHandleOpen}>

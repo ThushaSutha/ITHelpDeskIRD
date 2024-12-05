@@ -14,6 +14,7 @@ const LogoutButton = () => {
       localStorage.removeItem("token");
       localStorage.removeItem("Auth");
       localStorage.removeItem("AuthIv");
+      localStorage.removeItem("userRole");
       setRedirectPath(null);
       navigate("/signIn");
     }, 1000);

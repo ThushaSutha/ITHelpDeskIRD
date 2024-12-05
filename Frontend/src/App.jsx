@@ -34,7 +34,7 @@ function App() {
             <Route
               path="/dashboard/:view"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute roles={['staff']}>
                   <Dashboard />
                 </ProtectedRoute>
               }
