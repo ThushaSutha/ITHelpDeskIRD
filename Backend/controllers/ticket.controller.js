@@ -2,6 +2,7 @@ const { where } = require("sequelize");
 const db = require("../models");
 const Ticket = db.ticket;
 const Op = db.Sequelize.Op;
+const { encrypt, decrypt } = require("../helper/helper");
 
 //create and save a new ticket
 exports.create = (req, res) => {
@@ -80,6 +81,45 @@ exports.findOne = (req, res) => {
             message: err.message || "Error retrieving Ticket with id " + id
         });
     });
+};
+
+
+//Find  tickets with an specific user
+exports.findByUser = async (req, res) => {
+    const id = req.headers['x-auth-id'];
+    const iv = req.headers['x-auth-iv'];
+    const { page = 1 , size = 5 } = req.query;
+    const limit = +size;
+    const offset = (page - 1) * size;
+    console.log("id",id);
+
+    if (!id || !iv) {
+        return res.status(400).send({ message: "Missing authentication token or IV in",iv});
+    }
+
+    try {
+        const decryptId = decrypt(id,iv);
+        var condition = id ? { user_id: {[Op.like]: `%${decryptId}%`}} : null;
+        console.log("in tiket user_id", decryptId);
+        const tickets = await Ticket.findAndCountAll({
+            where: condition,
+            limit: limit,
+            offset: offset
+        });
+        console.log(tickets.rows);
+        res.status(200).send({
+            message: "Tickets found successfully",
+            data:tickets.rows,
+            totalItems: tickets.count,
+            totalPages: Math.ceil(tickets.count/limit),
+            currentPage: page
+        });
+        
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "Error retrieving tickets with user id " + id
+        });
+    }
 };
 
 //update a ticket by the id in the request

@@ -54,7 +54,7 @@ const Header = () => {
     </>
   ) : (
     <>
-      <Link to="/dashboard/my-ticket" className="text-gray-300 hover:text-white transition duration-300">My Ticket</Link>
+      <Link to="tickets" className="text-gray-300 hover:text-white transition duration-300">My Ticket</Link>
       <Link to="/dashboard/create-ticket" className="text-gray-300 hover:text-white transition duration-300">Create Ticket</Link>
     </>
   )}

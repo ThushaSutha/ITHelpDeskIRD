@@ -12,6 +12,9 @@ module.exports = app => {
     //get a ticket by id
     router.get('/:id',ticket.findOne);
 
+    //get tickets for logged user
+    router.get('/log/tickets',ticket.findByUser);
+
     //update a ticket with id
     router.put('/:id',ticket.update);
 

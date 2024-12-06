@@ -6,7 +6,7 @@ import { ThemeProvider } from "@material-tailwind/react";
 
 import { RedirectProvider } from './contexts/RedirectContext.jsx';
 import { UserProvider } from './contexts/ContextProvider.jsx';
-
+window.global = window;
 
 
 createRoot(document.getElementById('root')).render(

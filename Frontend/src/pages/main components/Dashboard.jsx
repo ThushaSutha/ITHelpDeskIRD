@@ -13,12 +13,13 @@ function Dashboard() {
     <>
       {role === "admin" ? (
         <>
-      <AdminDashboard />
+        <AdminDashboard />
+        
       
     </>
   ) : (
     <>
-      {!view || view === "my-ticket" ? <MyTicket /> : null}
+      {(!view || view === "my-ticket") && <MyTicket />}
       {view === "create-ticket" && <NewTicket />}
       </>
   )}

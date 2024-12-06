@@ -6,6 +6,7 @@ import BlankLayout from "./Layouts/user/BlankLayout";
 import AddUser from "./pages/admin/AddUser";
 import Dashboard from "./pages/main components/Dashboard";
 import ManageUser from "./pages/admin/ManageUser";
+import ManageTicket from "./pages/main components/ManageTicket";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 // import ProtectedRoute from "./route/protected route/ProtectedRoute";
@@ -44,6 +45,14 @@ function App() {
               element={
                 <ProtectedRoute roles={['staff','admin']}>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tickets"
+              element={
+                <ProtectedRoute roles={['staff','admin']}>
+                  <ManageTicket />
                 </ProtectedRoute>
               }
             />
