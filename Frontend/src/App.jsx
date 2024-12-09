@@ -14,6 +14,7 @@ import ProtectedRoute from "./contexts/ProtectedRoute"
 import PublicRoute from "./route/public route/PublicRoute";
 import Unauthorized from "./pages/main components/UnauthorizedPage";
 import Test from "./components/Test";
+import NewTicket from "./pages/main components/NewTicket";
 
 
 function App() {
@@ -56,6 +57,15 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/new-ticket"
+              element={
+                <ProtectedRoute roles={['staff','admin']}>
+                  <NewTicket />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/add"
               element={

@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-import NewTicket from "./NewTicket";
+
 import MyTicket from "./MyTicket";
 import AdminDashboard from "../admin/Dashboard"
 
@@ -19,8 +19,7 @@ function Dashboard() {
     </>
   ) : (
     <>
-      {(!view || view === "my-ticket") && <MyTicket />}
-      {view === "create-ticket" && <NewTicket />}
+     User Dashboard
       </>
   )}
 

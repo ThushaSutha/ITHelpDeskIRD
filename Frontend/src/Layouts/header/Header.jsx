@@ -37,12 +37,17 @@ const Header = () => {
           <a href="#" className="text-gray-300 hover:text-white transition duration-300">FAQ</a>
           <a href="#" className="text-gray-300 hover:text-white transition duration-300">About Us</a>
           <a href="#" className="text-gray-300 hover:text-white transition duration-300">Contact</a>
-          <Link
+          {token != null ?(
+            <></>
+          ):(
+            <Link
             to="/signIn"
             className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition duration-300"
           >
             Login
           </Link>
+          )}
+          
         </>
       ) : (
         <>
@@ -54,8 +59,8 @@ const Header = () => {
     </>
   ) : (
     <>
-      <Link to="tickets" className="text-gray-300 hover:text-white transition duration-300">My Ticket</Link>
-      <Link to="/dashboard/create-ticket" className="text-gray-300 hover:text-white transition duration-300">Create Ticket</Link>
+      <Link to="/tickets" className="text-gray-300 hover:text-white transition duration-300">My Ticket</Link>
+      <Link to="/new-ticket" className="text-gray-300 hover:text-white transition duration-300">Create Ticket</Link>
     </>
   )}
   <a href="#" className="text-gray-300 hover:text-white transition duration-300">Contact</a>
