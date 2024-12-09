@@ -50,14 +50,14 @@ function SignInForm() {
 
       if(data.role === 'admin'){
         // login('admin');
-        const path = redirectPath || "/users";
-        setRedirectPath(null); // Clear the stored path after use
+        const path = "/dashboard";
+        // setRedirectPath(null);
         navigate(path);
       }else{
         // login('staff');
-        const path = redirectPath || "/dashboard";
+        const path = "/dashboard";
         console.log(path);
-        setRedirectPath(null); // Clear the stored path after use
+        // setRedirectPath(null);
         navigate(path);
       }
       
