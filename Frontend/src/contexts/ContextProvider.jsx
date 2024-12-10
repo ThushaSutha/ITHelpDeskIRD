@@ -19,13 +19,13 @@ export const UserProvider = ({ children }) => {
     setAuthenticated(isAuthenticated);
   };
 
-  // Sync role with localStorage if it changes externally (optional)
+  // Sync role with localStorage if it changes externally 
   useEffect(() => {
     const storedRole = localStorage.getItem('userRole');
     if (storedRole !== role) {
       setRole(storedRole);
     }
-  }, []);
+  }, [role]);
 
   return (
     <userContext.Provider value={{ role, authenticated, updateRole, updateAuthentication }}>

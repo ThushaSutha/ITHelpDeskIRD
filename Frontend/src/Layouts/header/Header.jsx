@@ -36,9 +36,10 @@ const Header = () => {
       )}
       {location.pathname === '/' ? (
         <>
-          <a href="#" className="text-gray-300 hover:text-white transition duration-300">FAQ</a>
-          <a href="#" className="text-gray-300 hover:text-white transition duration-300">About Us</a>
-          <a href="#" className="text-gray-300 hover:text-white transition duration-300">Contact</a>
+        <Link to="/FAQ" className="text-gray-300 hover:text-white transition duration-300">FAQ</Link>
+        <Link to="/AboutUs" className="text-gray-300 hover:text-white transition duration-300">About Us</Link>
+        <Link to="/Contact" className="text-gray-300 hover:text-white transition duration-300">Contact</Link>
+          
           {token != null ?(
             <></>
           ):(
@@ -65,8 +66,9 @@ const Header = () => {
       <Link to="/new-ticket" className="text-gray-300 hover:text-white transition duration-300">Create Ticket</Link>
     </>
   )}
-  <a href="#" className="text-gray-300 hover:text-white transition duration-300">Contact</a>
-  <a href="#" className="text-gray-300 hover:text-white transition duration-300">FAQ</a>
+  <Link to="/Contact" className="text-gray-300 hover:text-white transition duration-300">Contact</Link>
+  <Link to="/FAQ" className="text-gray-300 hover:text-white transition duration-300">FAQ</Link>
+  
   <LogoutButton />
 </>
       )}
@@ -85,9 +87,9 @@ const Header = () => {
     <Link to="/" className="block text-gray-300 hover:text-white transition duration-300">Home</Link>
     {location.pathname === '/' ? (
       <>
-        <a href="#" className="block text-gray-300 hover:text-white transition duration-300">FAQ</a>
-        <a href="#" className="block text-gray-300 hover:text-white transition duration-300">About Us</a>
-        <a href="#" className="block text-gray-300 hover:text-white transition duration-300">Contact</a>
+        <Link to="/FAQ" className="text-gray-300 hover:text-white transition duration-300">FAQ</Link>
+        <Link to="/AboutUs" className="text-gray-300 hover:text-white transition duration-300">About Us</Link>
+        <Link to="/Contact" className="text-gray-300 hover:text-white transition duration-300">Contact</Link>
         <Link
           to="/signIn"
           className="block bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition duration-300"
@@ -99,8 +101,8 @@ const Header = () => {
       <>
         <Link to="/dashboard/my-ticket" className="block text-gray-300 hover:text-white transition duration-300">My Ticket</Link>
         <Link to="/dashboard/create-ticket" className="block text-gray-300 hover:text-white transition duration-300">Create Ticket</Link>
-        <a href="#" className="block text-gray-300 hover:text-white transition duration-300">Contact</a>
-        <a href="#" className="block text-gray-300 hover:text-white transition duration-300">FAQ</a>
+        <Link to="/Contact" className="text-gray-300 hover:text-white transition duration-300">Contact</Link>
+        <Link to="/FAQ" className="text-gray-300 hover:text-white transition duration-300">FAQ</Link>
         <Link
           to="/"
           className="block bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition duration-300"

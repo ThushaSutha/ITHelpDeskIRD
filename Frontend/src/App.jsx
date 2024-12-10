@@ -115,11 +115,11 @@ function App() {
 
 
           <Route path="*" element={<Navigate to= "/signIn" />}></Route>
-          <Route path="/AboutUs" element={<PublicRoute><AboutUs /></PublicRoute>} />
-          <Route path="/Contact" element={<PublicRoute><Contact /></PublicRoute>} /> 
-          <Route path="/FAQ" element={<PublicRoute><FAQ /></PublicRoute>} /> 
+          <Route path="/AboutUs" element={<AboutUs />} />
+          <Route path="/Contact" element={<Contact />} /> 
+          <Route path="/FAQ" element={<FAQ />} /> 
           
-          <Route path="/Chatbot" element={<PublicRoute><Chatbot /></PublicRoute>} /> 
+          <Route path="/Chatbot" element={<Chatbot />} /> 
 
         </Routes>
       </Router>
