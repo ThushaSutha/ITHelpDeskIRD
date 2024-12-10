@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import logoImageSrc from '../../images/logo-light.svg';
+import logoImageSrc from '../../images/IRDlogo.png';
 import { FaBars, FaTimes } from 'react-icons/fa'; // For hamburger and close icons
 import LogoutButton from '../../components/common/LogoutButton';
 
@@ -16,17 +16,19 @@ const Header = () => {
   const role = localStorage.getItem("userRole");
 
   return (
-    <header className="p-6 shadow-lg bg-gray-900  w-full top-0 z-10">
+    <header className="p-4 shadow-lg bg-gradient-to-b from-[#14142c]  via-[#0f0f55] to-[#151557] border-b-4 border-[#a2c516] w-full top-0 z-10">
   <div className="flex items-center justify-between">
     {/* Logo and Name Section */}
     <div className="flex items-center">
-      <img src={logoImageSrc} alt="Logo" className="w-24" />
-      <h2 className="text-2xl lg:text-5xl text-white font-serif ml-5">IRD</h2>
+    <img src={logoImageSrc} alt="Logo" className="w-24" />
+    <h2 className="text-2xl lg:text-4xl text-white  ml-5 font-display">Sri Lanka Inland Revenue</h2>
     </div>
+  
 
     {/* Navigation Links for Desktop */}
     <nav className="hidden lg:flex space-x-8 ml-auto">
       <Link to="/" className="text-gray-300 hover:text-white transition duration-300">Home</Link>
+      
       {token != null ?(
         <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">Dashboard</Link>
       ):(

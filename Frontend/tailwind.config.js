@@ -7,7 +7,9 @@ export default withMT({
     "./node_modules/@material-tailwind/react/components/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: { fontFamily:{
+      display:['cinzel'], display1:['merriweather-bold'], display2:['Roboto Condensed'], display3:['Roboto Condensed']
+    }},
     screens: {
       'xs': '240px',
       'sm': '640px',

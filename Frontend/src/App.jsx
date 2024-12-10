@@ -16,6 +16,10 @@ import Unauthorized from "./pages/main components/UnauthorizedPage";
 import Test from "./components/Test";
 import NewTicket from "./pages/main components/NewTicket";
 
+import AboutUs from "./pages/main components/AboutUs"
+import Contact from "./pages/main components/Contact";
+import Chatbot from "./pages/main components/Chatbot";
+import FAQ from "./pages/main components/FAQ";
 
 function App() {
   return (
@@ -111,6 +115,12 @@ function App() {
 
 
           <Route path="*" element={<Navigate to= "/signIn" />}></Route>
+          <Route path="/AboutUs" element={<PublicRoute><AboutUs /></PublicRoute>} />
+          <Route path="/Contact" element={<PublicRoute><Contact /></PublicRoute>} /> 
+          <Route path="/FAQ" element={<PublicRoute><FAQ /></PublicRoute>} /> 
+          
+          <Route path="/Chatbot" element={<PublicRoute><Chatbot /></PublicRoute>} /> 
+
         </Routes>
       </Router>
     </>
