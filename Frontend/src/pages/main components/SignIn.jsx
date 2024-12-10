@@ -17,7 +17,7 @@ function SignInForm() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { redirectPath, setRedirectPath } = useRedirect();
-  const { login } = useContext(userContext);
+  const { updateRole, updateAuthentication } = useContext(userContext);
   
   
 
@@ -33,6 +33,8 @@ function SignInForm() {
       const { data } = await api.post('/api/auth/signin', { email, password });
             
             // role(role);
+            updateRole(data.role);
+            updateAuthentication(true);
 
             localStorage.setItem('token', data.accessToken);
             localStorage.setItem('userRole',data.role);

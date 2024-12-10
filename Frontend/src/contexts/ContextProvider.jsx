@@ -5,24 +5,30 @@ export const userContext = createContext();
 
 // Context provider
 export const UserProvider = ({ children }) => {
-  // const [role, setRole] = useState(null); // Default role is null
-const role = localStorage.getItem('userRole');
-  const [authenticated, setAuthenticated] = useState(false); // Default to not authenticated
+  const [role, setRole] = useState(localStorage.getItem('userRole') || null); 
+  const [authenticated, setAuthenticated] = useState(!!localStorage.getItem('token'));
 
-  
+  // Update role dynamically after login
+  const updateRole = (newRole) => {
+    localStorage.setItem('userRole', newRole); // Update localStorage
+    setRole(newRole); // Update context state
+  };
 
-  // Optional: Fetch role/auth status from backend or local storage
-  // useEffect(() => {
-  //   // Simulate fetching from local storage or an API
-  //   const storedRole = localStorage.getItem('userRole');
-  //   if (storedRole) {
-  //     setRole(storedRole);
-  //     setAuthenticated(true);
-  //   }
-  // }, []);
+  // Check authentication state
+  const updateAuthentication = (isAuthenticated) => {
+    setAuthenticated(isAuthenticated);
+  };
+
+  // Sync role with localStorage if it changes externally (optional)
+  useEffect(() => {
+    const storedRole = localStorage.getItem('userRole');
+    if (storedRole !== role) {
+      setRole(storedRole);
+    }
+  }, []);
 
   return (
-    <userContext.Provider value={{ role, authenticated }}>
+    <userContext.Provider value={{ role, authenticated, updateRole, updateAuthentication }}>
       {children}
     </userContext.Provider>
   );
