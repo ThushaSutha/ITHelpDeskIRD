@@ -23,8 +23,8 @@ const TicketForm = () => {
     name: "",
     email: "",
     phone: "",
-    branch: "",
-    department: "",
+    region: "",
+    unit: "",
     issueType: "",
     priorityLevel: "",
     deviceCategory: "",
@@ -40,10 +40,8 @@ const TicketForm = () => {
     return (
       formData.name &&
       formData.email &&
-      formData.phone &&
-      formData.branch &&
-      formData.department &&
-      formData.issueType
+      formData.phone 
+      
     );
   };
 
@@ -56,7 +54,6 @@ const TicketForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you can submit the form data to the server
     console.log("Form Data:", formData);
   };
 
@@ -94,18 +91,6 @@ const TicketForm = () => {
         <div className="flex flex-col md:flex-row mt-6 gap-4">
           <div className="md:w-full">
             <TicketInfoForm handleChange={handleChange} />
-            {/* Button UI improvements */}
-            {/* <Button
-              type="submit"
-              color="blue"
-              className={`w-full mt-5 py-3 text-lg font-semibold transition duration-300 ease-in-out 
-              transform hover:scale-105 hover:shadow-lg hover:bg-blue-700 
-              disabled:bg-blue-300 disabled:cursor-not-allowed disabled:opacity-70`}
-              disabled={!isFormValid()} // Disable button until form is valid
-            >
-              {isFormValid() ? "Submit" : "Complete All Fields"}
-            </Button> */}
-
             <div className="flex items-center justify-center gap-4 mb-5">
               <Button
                 type="submit"

@@ -13,33 +13,38 @@ const TicketInfoForm = ({
   const [brand, setBrand] = useState("");
 
   const [description, setDescription] = useState("");
-  const options = ["Equipment Issue", "Software Issue", "Network Issue", "RAMIS System Issue", "Email Issue","Others"];
-  const priority = ["High", "Low", "Medium"];
-  const deviceCategory = ["CPU", "Monitor", "Printer","Scanner","Phone(Analog)","Phone(Digital)","Network Switch","UPS","Others"];
-  const [selectedOption, setSelectedOption] = useState("");
+  const Issues = [
+    {value: "Equipment Issue",label: "Equipment Issue"},
+    {value:"Software Issue",label:"Software Issue"}, 
+    {value:"Network Issue",label:"Network Issue"}, 
+    {value:"RAMIS System Issue",label:"RAMIS System Issue"}, 
+    {value:"Email Issue",label:"Email Issue"},
+    {value:"Others",label:"Others"},
+  ];
+  const priority = [
+    {value:"High",label:"High"}, 
+    {value:"Low",label:"Low"}, 
+    {value:"Medium",label:"Medium"},
+  ];
+  const deviceCategory = [
+    {value:"CPU",label:"CPU"}, 
+    {value:"Monitor",label:"Monitor"}, 
+    {value:"Printer",label:"Printer"},
+    {value:"Scanner",label:"Scanner"},
+    {value:"Phone(Analog)",label:"Phone(Analog)"},
+    {value:"Phone(Digital)",label:"Phone(Digital)"},
+    {value:"Network Switch",label:"Network Switch"},
+    {value:"UPS",label:"UPS"},
+    {value:"Others", label:"Others"},
+  ];
+  const [selectedIssue, setSelectedIssue] = useState("");
   const [selectedPriority, setSelectedPriority] = useState("");
   const [selectedDeviceCategory, setSelectedDeviceCategory] = useState("");
 
-  // Function to handle the selected option
-  const handleIssueChange = (option) => {
-    const newIssue = typeof option === 'object' ? option.target.value : option; // Check if option is event or value
-    setSelectedOption(newIssue); // Update the state with the selected option
-    handleChange("issueType", newIssue);
-    console.log("Selected option:", newIssue);
-  };
+  
 
-  const handlePriorityChange = (option) => {
-    const newPriority = typeof option === 'object' ? option.target.value : option; // Check if option is event or value
-    setSelectedPriority(newPriority); // Update the state with the selected option
-    handleChange("priorityLevel", newPriority);
-    console.log("Selected option:", newPriority);
-  };
-  const handleDeviceCategoryChange = (option) => {
-    const newDeviceCategory = typeof option === 'object' ? option.target.value : option; // Check if option is event or value
-    setSelectedDeviceCategory(newDeviceCategory); // Update the state with the selected option
-    handleChange("newDeviceCategory", newDeviceCategory);
-    console.log("Selected option:", newDeviceCategory);
-  };
+  
+  
   
 
   const handleSerialChange = (e) => {
@@ -79,10 +84,12 @@ const TicketInfoForm = ({
               {/* Issue Type */}
               <Select2LikeComponent
                 label="Issue Type"
-                options={options}
+                options={Issues}
                 required={true}
-                value={selectedOption}
-                onSelectChange={handleIssueChange} // Pass the handler function
+                value={selectedIssue}
+                onSelectChange={(option) => {
+                  setSelectedIssue(option);
+                }}
               />
             </div>
 
@@ -93,7 +100,9 @@ const TicketInfoForm = ({
                 options={priority}
                 required={true}
                 value={selectedPriority}
-                onSelectChange={handlePriorityChange} // Pass the handler function
+                onSelectChange={(option) =>{
+                  setSelectedPriority(option);
+                }}
               />
             </div>
 
@@ -104,7 +113,9 @@ const TicketInfoForm = ({
                 options={deviceCategory}
                 required={true}
                 value={selectedDeviceCategory}
-                onSelectChange={handleDeviceCategoryChange} // Pass the handler function
+                onSelectChange={(option) =>{
+                  setSelectedDeviceCategory(option);
+                }}
               />
             </div>
 

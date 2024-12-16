@@ -1,27 +1,55 @@
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import PropTypes from "prop-types";
 import Select2LikeComponent from "../common/Select2LikeComponent";
+import RegionService from "../../services/region.service";
+import unitService from "../../services/unit.service";
 
 const LocationInfoForm = ({ handleChange }) => {
-  const [selectedOption, setSelectedOption] = useState("");
-  const [selectedOption1, setSelectedOption1] = useState("");
-  const options = ["Option 1", "Option 2", "Option 3", "Option 4", "Option 5"];
-  const options1 = ["Option 1", "Option 2", "Option 3", "Option 4"];
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [selectedUnit, setSelectedUnit] = useState("");
+  const [regions, setRegions] = useState([]);
+  const [units, setUnits] = useState([]);
 
-  // Function to handle the selected option
-  const handleSelectChange = (option) => {
-    const newBranch = typeof option === 'object' ? option.target.value : option; // Check if option is event or value
-    setSelectedOption(newBranch); // Update the state with the selected option
-    handleChange("branch", newBranch);
-    console.log("Selected option:", newBranch);
+
+  const retrieveRegion = async () => {
+    try {
+      const response = await RegionService.getAll();
+      console.log(response.data.data);
+      // Transform the response data into the required format
+      const formattedRegions = response.data.data.map((region) => ({
+        label: region.name,
+        value: region.id,
+      }));
+
+      setRegions(formattedRegions);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleSelectChange1 = (option1) => {
-    const newDepartment = typeof option1 === 'object' ? option1.target.value : option1;
-    setSelectedOption1(newDepartment); // Update the state with the selected option
-    handleChange("department", newDepartment);
-    console.log("Selected option1:", newDepartment);
+  //fetch region data
+  const retrieveUnit = async () => {
+    try {
+      const response = await unitService.getAll();
+      console.log(response.data.data);
+      // Transform the response data into the required format
+      const formattedUnit = response.data.data.map((unit) => ({
+        label: unit.name,
+        value: unit.id,
+      }));
+
+      setUnits(formattedUnit);
+    } catch (error) {
+      console.log(error);
+    }
   };
+  
+
+  useEffect(() => {
+    retrieveRegion();
+    retrieveUnit();
+    
+  }, []);
 
   return (
     <>
@@ -34,11 +62,15 @@ const LocationInfoForm = ({ handleChange }) => {
             <div className="flex-auto">
               {/* Branch */}
               <Select2LikeComponent
-                label="Branch"
-                options={options}
+                label="Region"
+                options={regions}
                 required={true}
-                value={selectedOption}
-                onSelectChange={handleSelectChange} // Pass the handler function
+                value={selectedRegion}
+                onSelectChange={(option) => {
+                  console.log(option.value);
+                  setSelectedRegion(option);
+                  handleChange("region", selectedRegion);  
+                }}
               />
             </div>
           </div>
@@ -46,12 +78,14 @@ const LocationInfoForm = ({ handleChange }) => {
             <div className="flex-auto">
               {/* Department */}
               <Select2LikeComponent
-                label="Department"
-                options={options1}
-                multiSelect={false}
+                label="Unit"
+                options={units}
                 required={true}
-                value={selectedOption1}
-                onSelectChange={handleSelectChange1} // Pass the handler function
+                value={selectedUnit}
+                onSelectChange={(option) => {
+                  setSelectedUnit(option);
+                  
+                }}
               />
             </div>
           </div>
