@@ -21,59 +21,56 @@ const Header = () => {
     {/* Logo and Name Section */}
     <div className="flex items-center">
     <img src={logoImageSrc} alt="Logo" className="w-24" />
-    <h2 className="text-2xl lg:text-4xl text-white  ml-5 font-display">Sri Lanka Inland Revenue</h2>
+    <h2 className="text-2xl lg:text-2xl text-white  ml-5 font-display font-bold">Sri Lanka Inland Revenue</h2>
     </div>
   
 
-    {/* Navigation Links for Desktop */}
     <nav className="hidden lg:flex space-x-8 ml-auto">
-      <Link to="/" className="text-gray-300 hover:text-white transition duration-300">Home</Link>
-      
-      {token != null ?(
-        <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">Dashboard</Link>
-      ):(
-        ""
-      )}
-      {location.pathname === '/' ? (
+  {/* Always visible */}
+  <Link to="/" className="text-gray-300 hover:text-white transition duration-300">Home</Link>
+
+  {token != null ? (
+    <>
+      {/* Admin-specific links */}
+      {role === "admin" ? (
         <>
-        <Link to="/FAQ" className="text-gray-300 hover:text-white transition duration-300">FAQ</Link>
-        <Link to="/AboutUs" className="text-gray-300 hover:text-white transition duration-300">About Us</Link>
-        <Link to="/Contact" className="text-gray-300 hover:text-white transition duration-300">Contact</Link>
-          
-          {token != null ?(
-            <></>
-          ):(
-            <Link
-            to="/signIn"
-            className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition duration-300"
-          >
-            Login
-          </Link>
-          )}
-          
+          <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">Dashboard</Link>
+          <Link to="/users" className="text-gray-300 hover:text-white transition duration-300">Manage Users</Link>
+          <Link to="/tickets" className="text-gray-300 hover:text-white transition duration-300">Manage Tickets</Link>
         </>
       ) : (
         <>
-  {role === "admin" ? (
-    <>
-      <Link to="/users" className="text-gray-300 hover:text-white transition duration-300">Manage Users</Link>
-      <Link to="/tickets" className="text-gray-300 hover:text-white transition duration-300">Manage Tickets</Link>
-      
+          {/* Non-admin user-specific links */}
+          <Link to="/tickets" className="text-gray-300 hover:text-white transition duration-300">My Ticket</Link>
+          <Link to="/new-ticket" className="text-gray-300 hover:text-white transition duration-300">Create Ticket</Link>
+          <Link to="/add-service" className="text-gray-300 hover:text-white transition duration-300">Add Service Com</Link>
+          <Link to="/add-device" className="text-gray-300 hover:text-white transition duration-300">Add Device</Link>
+          
+        </>
+      )}
+      {/* Common links for logged-in users */}
+      <Link to="/Contact" className="text-gray-300 hover:text-white transition duration-300">Contact</Link>
+      <Link to="/FAQ" className="text-gray-300 hover:text-white transition duration-300">FAQ</Link>
+      <LogoutButton />
     </>
   ) : (
     <>
-      <Link to="/tickets" className="text-gray-300 hover:text-white transition duration-300">My Ticket</Link>
-      <Link to="/new-ticket" className="text-gray-300 hover:text-white transition duration-300">Create Ticket</Link>
+      {/* Links visible for non-logged-in users */}
+      <Link to="/FAQ" className="text-gray-300 hover:text-white transition duration-300">FAQ</Link>
+      <Link to="/AboutUs" className="text-gray-300 hover:text-white transition duration-300">About Us</Link>
+      <Link to="/Contact" className="text-gray-300 hover:text-white transition duration-300">Contact</Link>
+      <Link
+        to="/signIn"
+        className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition duration-300"
+      >
+        Login
+      </Link>
     </>
   )}
-  <Link to="/Contact" className="text-gray-300 hover:text-white transition duration-300">Contact</Link>
-  <Link to="/FAQ" className="text-gray-300 hover:text-white transition duration-300">FAQ</Link>
-  
-  <LogoutButton />
-</>
-      )}
-    </nav>
-
+</nav>
+    
+    
+    
     {/* Hamburger Icon for Mobile */}
     <div className="lg:hidden">
       <button onClick={toggleMenu} aria-label="Toggle Menu" className="text-white focus:outline-none">

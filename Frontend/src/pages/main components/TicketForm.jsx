@@ -60,10 +60,10 @@ const TicketForm = () => {
   return (
     <>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="mt-5 ml-5">
+      <div className="mt-5 ml-5" >
           <Typography
             color="blue-gray"
-            className="underline text-3xl text-black md:text-5xl"
+            className="underline text-gray-900 md:text-3xl font-display1 font-bold" 
           >
             Device Trouble Report
           </Typography>

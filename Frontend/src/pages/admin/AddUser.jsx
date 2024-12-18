@@ -39,14 +39,36 @@ const AddUser = ({ isEditMode = false }) => {
   const [units, setUnits] = useState([]);
   const today = new Date().toISOString().split("T")[0];
   const role = [
-    { value: "admin", label: "Admin" },
-    { value: "it_officer", label: "IT officer" },
+    { value: "it_director", label: "IT_Director" },
+    { value: "it_officer", label: "IT_Officer" },
+    { value: "it_team", label: "IT_Team" },
     { value: "staff", label: "Staff" },
+    { value: "account_staff", label: "Account_Staff" },
+    { value: "supply_staff", label: "Supply_Staff" },
   ];
   const designation = [
-    { value: "HR", label: "HR" },
-    { value: "IT staff", label: "IT Staff" },
-    { value: "Account", label: "Account" }
+    { value: "ICTA", label: "ICTA" },
+    { value: "icto", label: "ICTO" },
+    { value: "acir", label: "ACIR" },
+    { value: "sdcir", label: "SDCIR" },
+    { value: "ao", label: "AO" },
+    { value: "mso", label: "MSO" },
+    { value: "ictad", label: "ICTAD" },
+    { value: "ictdd", label: "ICTDD" },
+    { value: "", label: "DCIR" },
+    { value: "", label: "Receptionist" },
+    { value: "", label: "CIR" },
+    { value: "", label: "Accountant" },
+    { value: "", label: "Storekeeper" },
+    { value: "", label: "Research_Officer" },
+    { value: "", label: "AD" },
+    { value: "", label: "Director" },
+    { value: "", label: "DDC" },
+    { value: "", label: "DO" },
+    { value: "", label: "Librarian" },
+    { value: "", label: "ICTD" },
+    { value: "", label: "Translator" },
+    { value: "", label: "CC" },
   ];
 
   const [formData, setFormData] = useState({
@@ -415,7 +437,7 @@ const AddUser = ({ isEditMode = false }) => {
       <div className=" mb-6 ">
         <Typography
           color="blue-gray"
-          className="underline text-3xl text-black md:text-5xl"
+          className="underline text-gray-900 md:text-3xl font-display1 font-bold" 
         >
           {isEditMode ? "Update User" : "Add New User"}
         </Typography>

@@ -2,6 +2,8 @@ import React from "react";
 import serverIllustrationImageSrc from "../../images/Contact.png";
 
 
+
+
 function Contact() {
   const [state, setState] = React.useState({
     name: "",
@@ -25,8 +27,11 @@ function Contact() {
   };
 
   return (
+    
     <div className="bg-gradient-to-r from-[#20213f] to-[#303238] text-gray-400 min-h-screen flex flex-col justify-center">
+  
     <div className="flex items-center justify-center min-h-screen bg-gray-400 ">
+   
       <div className="w-full max-w-2xl p-6 bg-white shadow-lg rounded-lg md:flex md:flex-row md:space-x-6">
         <div className="hidden md:flex md:flex-col md:items-center md:justify-center bg-gradient-to-r from-[#222150] to-[#232a3b] rounded-lg p-6 md:w-1/2">
           <h1 className="text-2xl font-semibold text-blue-100 mb-4">
