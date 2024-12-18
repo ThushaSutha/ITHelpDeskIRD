@@ -1,43 +1,53 @@
 const { where } = require("sequelize");
 const db = require("../models");
 const Ticket = db.ticket;
+const Ticket_Category = db.ticket_category;
 const Op = db.Sequelize.Op;
 const { encrypt, decrypt } = require("../helper/helper");
 
 //create and save a new ticket
-exports.create = (req, res) => {
-    // Validate request
-    if (!req.body.title) {
-        res.status(400).send({
-            message: "Title can not be empty"
-        });
-        return;
-    }
+exports.create = async (req, res) => {
+    try {
+        // Validate request
+        if (!req.body.title) {
+            return res.status(400).send({
+                message: "Title cannot be empty"
+            });
+        }
 
-    //create a ticket
-    const ticket = {
-        title: req.body.title,
-        description: req.body.description,
-        status_id: req.body.status,
-        user_id: req.body.userId,
-        assigned_to: req.body.assignedTo,
-        priority:req.body.priority
-    };
+        // Create a ticket
+        const ticket = {
+            title: req.body.title,
+            description: req.body.description,
+            status_id: req.body.status,
+            user_id: req.body.userId,
+            assigned_to: req.body.assignedTo,
+            priority: req.body.priority
+        };
 
-    //save Tutorial in the database
-    Ticket.create(ticket)
-    .then(data => {
+        // Save Ticket in the database
+        const createdTicket = await Ticket.create(ticket);
+
+        if (req.body.categoryIds && req.body.categoryIds.length > 0) {
+            const categories = await db.category.findAll({
+                where: { id: req.body.categoryIds }
+            });
+
+            // Use Sequelize association method
+            await createdTicket.addCategories(categories);
+        }
+
         res.status(201).send({
             message: "Ticket created successfully",
-            data: data
+            data: createdTicket
         });
-    }).catch(err => {
+    } catch (err) {
         res.status(500).send({
-            message: err.message || "Some error occurred while creating the Ticket.",
+            message: err.message || "Some error occurred while creating the Ticket."
         });
-    });
-
+    }
 };
+
 
 //Retrieve all tickets from the database.
 exports.findAll = (req, res) => {

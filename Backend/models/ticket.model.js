@@ -13,7 +13,7 @@ module.exports = (sequelize, Sequelize)=>{
             type: Sequelize.TEXT,
             allowNull: false
         },
-        status_id:{
+        status:{
             type: Sequelize.TINYINT,
             allowNull:false,
             defaultValue: 0
@@ -36,7 +36,7 @@ module.exports = (sequelize, Sequelize)=>{
                 model: 'users',
                 key: 'emId'
             }
-        }
+        },
     },{
         tableName:'tickets',
         timestamps: true,
