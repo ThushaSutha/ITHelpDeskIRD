@@ -7,7 +7,6 @@ const { encrypt, decrypt } = require("../helper/helper");
 
 //create and save a new ticket
 exports.create = async (req, res) => {
-    try {
         // Validate request
         if (!req.body.title) {
             return res.status(400).send({
@@ -22,30 +21,21 @@ exports.create = async (req, res) => {
             status_id: req.body.status,
             user_id: req.body.userId,
             assigned_to: req.body.assignedTo,
-            priority: req.body.priority
+            priority: req.body.priority,
+            category_id: req.body.category
         };
 
-        // Save Ticket in the database
-        const createdTicket = await Ticket.create(ticket);
-
-        if (req.body.categoryIds && req.body.categoryIds.length > 0) {
-            const categories = await db.category.findAll({
-                where: { id: req.body.categoryIds }
+        Ticket.create(ticket)
+        .then(data=>{
+            res.status(201).send({
+                message: "Ticket created successfully",
+                data: data
             });
-
-            // Use Sequelize association method
-            await createdTicket.addCategories(categories);
-        }
-
-        res.status(201).send({
-            message: "Ticket created successfully",
-            data: createdTicket
-        });
-    } catch (err) {
-        res.status(500).send({
-            message: err.message || "Some error occurred while creating the Ticket."
-        });
-    }
+        }).catch(err=>{
+            res.status(500).send({
+                message: err.message ||  "Error creating ticket",
+            });
+        });    
 };
 
 

@@ -37,6 +37,14 @@ module.exports = (sequelize, Sequelize)=>{
                 key: 'emId'
             }
         },
+        category_id:{
+            type: Sequelize.INTEGER,
+            references:{
+                model: 'categories',
+                key: 'id'
+            }
+
+        },
     },{
         tableName:'tickets',
         timestamps: true,

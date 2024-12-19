@@ -326,17 +326,17 @@ const Test = () => {
           <div className="flex flex-row ">
             <div className="basis-11/12  ">
               <Typography variant="h5" color="blue-gray">
-                Welcome Admin
+                Welcome
               </Typography>
               <Typography color="gray" className="mt-1 mb-5 font-normal">
-                Users Management
+                Tickets Management
               </Typography>
             </div>
-            <div className="basis-1/12 ">
-              <Link to="/add">
+            <div className="basis-2/12 ">
+              <Link to="/new-ticket">
                 <Button className="flex  items-center " size="sm">
                   <UserPlusIcon className="h-6 w-6 text-white" />
-                  Add User
+                  Add Ticket
                 </Button>
               </Link>
             </div>

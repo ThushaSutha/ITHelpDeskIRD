@@ -67,7 +67,7 @@ const TicketForm = () => {
           >
             Device Trouble Report
           </Typography>
-          <div className="flex md:w-[500px] items-center mt-5">
+          {/* <div className="flex md:w-[500px] items-center mt-5">
             <Typography color="gray" className="font-normal whitespace-nowrap">
               Reference NO:
             </Typography>
@@ -76,7 +76,7 @@ const TicketForm = () => {
               disabled
               className="ml-4 w-[160px] md:w-[350px] text-center bg-gray-100 border border-gray-300 rounded-md p-1"
             />
-          </div>
+          </div> */}
         </div>
 
         <div className="flex flex-col md:flex-row mt-6 gap-4">

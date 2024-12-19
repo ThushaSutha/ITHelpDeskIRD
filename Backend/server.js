@@ -50,6 +50,8 @@ require('./routes/user.routes')(app);
 require('./routes/ticket.routes')(app);
 require('./routes/region.routes')(app);
 require('./routes/unit.routes')(app);
+require('./routes/category.routes')(app);
+require('./routes/device.routes')(app)
 
 
 

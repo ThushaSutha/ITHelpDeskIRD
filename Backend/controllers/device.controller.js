@@ -1,76 +1,79 @@
-const {where} = require('sequelize');
-const db = require('../models');
-const Region = db.region;
+const {where} = require('sequelize')
+const db = require('../models');;
+const Device = db.device;
 const Op = db.Sequelize.Op;
 
 exports.create = (req,res) =>{
-    if(!req.body.name){
+    if(!req.body.device_type) {
         res.status(400).send({
-            message: "Name can not be empty"
+            message:"Name can not be empty"
         });
+
         return;
     }
 
-
-    //create a region
-    const region = {
-        name: req.body.name,
+    //create a device
+    const device = {
+        brand: req.body.brand,
+        model: req.body.model,
+        serial_number: req.body.serial_number,
+        device_type : req.body.device_type,
+        purchase_date: req.body.purchase_date,
+        warranty_expiration_date: req.body.warranty_expiration_date,
+        company_id : req.body.company_id,
+        user_id : req.body.user_id
     };
 
-    //save region in the database
-    Region.create(region)
-    .then(data =>{
+    Device.create(device)
+    .then(data=>{
         res.status(201).send({
-            message: "Region created successfully",
-            data: data
+            message:"device created successfully",
+            data:data
         });
-    }).catch(err => {
+    }).catch(err=>{
         res.status(500).send({
-            message: err.message || "Some error occurred while creating the Region."
+            message:err.message || "Some error occurred while creating the device."
         });
     });
 };
 
-//Retrieve all region from the database.
-exports.findAll = (req, res) => {
-    const title = req.query.title;
-    var condition = title ? { title: { [Op.like]: `%${title}%` }} : null;
 
-    Region.findAll({ where: condition})
-    .then(data => {
+//Retrieve all device from database
+exports.findAll=(req,res)=>{
+    
+    Device.findAll()
+    .then(data=>{
         res.status(200).send({
-            message: "All regions retrieved successfully",
-            data: data
+            message:"All categories retrieved successfully ",
+            data:data
+
         });
-    })
-    .catch(err => {
+    }).catch(err=>{
         res.status(500).send({
-            message: err.message || "Some error occurred while retrieving tutorials."
+            message:err.message || "Some error occurred while retrieving categories.",
         });
     });
-
-
 };
 
-// find a single region with a id
+// find a single device with a id
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
-    Region.findByPk(id)
+    Device.findByPk(id)
     .then(data => {
         if(data){
             res.status(200).send({
-                message: "Region found",
+                message: "device found",
                 data: data
             });
         }else{
             res.status(404).send({
-                message: "Region not found"
+                message: "device not found"
             });
         }
     }).catch(err =>{
         res.status(500).send({
-            message: err.message || "Some error occurred while retrieving region"
+            message: err.message || "Some error occurred while retrieving device"
         });
     });
 };
@@ -79,56 +82,56 @@ exports.findOne = (req, res) => {
 exports.update = (req,res) => {
     const id = req.params.id;
 
-    Region.update(req.body,{
+    Device.update(req.body,{
         where: {id: id}
     }).then(num =>{
         if(num == 1){
             res.status(200).send({
-                message: "Region updated successfully"
+                message: "device updated successfully"
             });
         }else{
             res.status(404).send({
-                message: "Region not found"
+                message: "device not found"
             });
         }
     }).catch(err => {
         res.status(500).send({
-            message: err.message || "Error updating Region"
+            message: err.message || "Error updating device"
         });
     });
 };
 
 
-//delete a region with the specified id in the request
+//delete a device with the specified id in the request
 exports.delete = (req,res) => {
     const id = req.params.id;
 
-    Region.destroy({
+    Device.destroy({
         where: {id: id}
     }).then(num => {
         if(num == 1){
             res.status(200).send({
-                message: "Region deleted successfully"
+                message: "device deleted successfully"
             });
         }else{
             res.status(404).send({
-                message: "Region not found"
+                message: "device not found"
             });
         }
     }).catch(err =>{
         res.status(500).send({
-            message: err.message || "Could not delete Region!"
+            message: err.message || "Could not delete device!"
         });
     });
 };
 
-//retrieve all deleted regions
+//retrieve all deleted device
 exports.findAllDeleted = (req,res) =>{
     const { page = 1 , size = 10 } = req.query;
     const limit = size * 1;
     const offset = (page - 1) * size;
 
-    Region.findAndCountAll({
+    Device.findAndCountAll({
         where: {
             deletedAt: {[Op.ne]: null}},
         paranoid: false,
@@ -137,7 +140,7 @@ exports.findAllDeleted = (req,res) =>{
         
     }).then(result => {
         res.status(200).send({
-            message: "Deleted Regions retrieved successfully",
+            message: "Deleted device retrieved successfully",
             data: result.rows,
             totalItems: result.count,
             totalPages: Math.ceil(result.count / limit),
@@ -145,12 +148,8 @@ exports.findAllDeleted = (req,res) =>{
         });
     }).catch(err => {
         res.status(500).send({
-            message: err.message || "Error retrieving deleted Regions"
+            message: err.message || "Error retrieving deleted Categories"
         });
     });
     
 };
-
-
-
-
