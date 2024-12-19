@@ -399,86 +399,85 @@ const Test = () => {
   handler={handleOpen}
   className="bg-transparent shadow-none"
 >
-<DialogBody className="xs:h-[42rem] sm:h-full xs:overflow-auto sm:overflow-hidden">
-  <Card className="mx-auto w-full max-w-lg lg:max-w-2xl">
+<DialogBody className="h-auto sm:h-full overflow-auto">
+  <Card className="mx-auto w-full max-w-2xl">
     <CardBody className="flex flex-col gap-4">
       <Typography variant="h4" color="blue-gray" className="flex justify-center">
         User Details
       </Typography>
-      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left Section: Avatar */}
-        <div className="grid grid-rows-2 gap-5 justify-items-center bg-gradient-to-t from-deep-orange-500 to-deep-orange-100 rounded-lg">
+        <div className="flex flex-col items-center bg-gradient-to-t from-indigo-900 to-deep-orange-100 rounded-lg p-5">
           <Avatar
             name={selectedRow?.name}
             size="100"
-            className="mt-5 rounded-full"
+            className="rounded-full"
           />
-          <div className="grid justify-items-center">
+          <div className="text-center mt-3">
             <Typography variant="h5" className="text-white">
               {selectedRow?.name}
-              <div className="grid text-sm justify-center">
-              {selectedRow?.designation}
-              </div>
             </Typography>
-            <Typography variant="h6" className="text-white">
-              
+            <Typography variant="body2" className="text-white text-sm">
+              {selectedRow?.designation}
             </Typography>
           </div>
         </div>
 
         {/* Right Section: Details */}
         <div className="col-span-2">
-          <div className="ml-5">
+          <div className="p-5">
             {/* Personal Details */}
-            <div className="flex justify-center">Personal</div>
+            <div className="text-center font-semibold text-lg">Personal</div>
             <hr className="border-t-2 border-gray-300 mb-4" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Typography variant="h6">Employee Id</Typography>
-                {selectedRow?.employeeId}
+                <Typography variant="h6">Employee ID</Typography>
+                <div>{selectedRow?.employeeId}</div>
               </div>
               <div>
                 <Typography variant="h6">Email</Typography>
-                {selectedRow?.email}
+                <div>{selectedRow?.email}</div>
               </div>
               <div>
                 <Typography variant="h6">Contact No</Typography>
-                {selectedRow?.contact}
+                <div>{selectedRow?.contact}</div>
               </div>
               <div>
                 <Typography variant="h6">Role</Typography>
-                {selectedRow?.role
-                  .split("_")
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")}
+                <div>
+                  {selectedRow?.role
+                    .split("_")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
+                </div>
               </div>
             </div>
 
             {/* Location Details */}
-            <div className="flex justify-center mt-5">Location</div>
+            <div className="text-center font-semibold text-lg mt-6">Location</div>
             <hr className="border-t-2 border-gray-300 mb-4" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Typography variant="h6">Region</Typography>
-                {selectedRow?.region_id}
+                <div>{selectedRow?.region_id}</div>
               </div>
               <div>
                 <Typography variant="h6">Unit</Typography>
-                {selectedRow?.unit_id}
+                <div>{selectedRow?.unit_id}</div>
               </div>
             </div>
 
             {/* Asset Details */}
-            <div className="flex justify-center mt-5">Asset</div>
+            <div className="text-center font-semibold text-lg mt-6">Asset</div>
             <hr className="border-t-2 border-gray-300 mb-4" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Typography variant="h6">Name</Typography>
-                {selectedRow?.region_id}
+                <div>{selectedRow?.asset_name}</div>
               </div>
               <div>
                 <Typography variant="h6">Serial Number</Typography>
-                {selectedRow?.serial_number}
+                <div>{selectedRow?.serial_number}</div>
               </div>
             </div>
           </div>
@@ -491,9 +490,9 @@ const Test = () => {
       </Button>
     </CardFooter>
   </Card>
-  </DialogBody>
-</Dialog>
+</DialogBody>
 
+</Dialog>
 
       {/* delete modal */}
       <Dialog open={deleteOpen} size="xs" handler={deleteHandleOpen}>

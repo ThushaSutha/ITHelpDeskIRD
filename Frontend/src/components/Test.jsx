@@ -371,7 +371,7 @@ const Test = () => {
         <Card className="mx-auto w-full max-w-[24rem]">
           <CardBody className="flex flex-col gap-4">
             <Typography variant="h4" color="blue-gray">
-              User Details
+              User Details ggg
             </Typography>
             {/* <Typography
               className="mb-3 font-normal"

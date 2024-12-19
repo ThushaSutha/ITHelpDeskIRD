@@ -20,6 +20,9 @@ import AboutUs from "./pages/main components/AboutUs"
 import Contact from "./pages/main components/Contact";
 import Chatbot from "./pages/main components/Chatbot";
 import FAQ from "./pages/main components/FAQ";
+import AddServiceCompanyDetails from "./pages/supplystaff/addservicecompany";
+import AddDeviceDetails from "./pages/supplystaff/adddevice";
+
 
 function App() {
   return (
@@ -69,6 +72,23 @@ function App() {
                 </ProtectedRoute>
               }
             />
+               <Route
+              path="/add-service"
+              element={
+                <ProtectedRoute roles={['staff','admin']}>
+                  <AddServiceCompanyDetails />
+                </ProtectedRoute>
+              }
+            />
+
+              <Route
+              path="/add-device"
+              element={
+                <ProtectedRoute roles={['staff','admin']}>
+                  <AddDeviceDetails />
+                </ProtectedRoute>
+              }
+            />        
 
             <Route
               path="/add"
