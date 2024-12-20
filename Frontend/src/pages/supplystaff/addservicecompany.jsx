@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Button, Input, Typography, Select, Option, Textarea } from "@material-tailwind/react";
+import { Button, Typography, Select, Option, Textarea } from "@material-tailwind/react";
+import InputField from "../../components/common/InputField";
+import PhoneInput from "../../components/common/PhoneInput";
 
 const AddServiceCompanyDetails = () => {
   const [formData, setFormData] = useState({  
@@ -56,24 +58,25 @@ const AddServiceCompanyDetails = () => {
    
         {/* Row 1 */}
         <div>
-          <Typography variant="h6" color="blue-gray" className="mb-3">Company ID <span className="text-red-500">*</span></Typography>
-          <Input
+          
+          <InputField
+            type="text"
+            label="Company ID"
             placeholder="Enter Company ID"
             value={formData.companyid}
             onChange={(e) => handleChange("companyid", e.target.value)}
-            className="w-[550px]" // Reduced width
-            required
+            required={true}
           />
         </div>
        
         <div>
-        <Typography variant="h6" color="blue-gray" className="mb-3">Company Name <span className="text-red-500">*</span></Typography>
-          <Input
+          <InputField
+            type="text"
+            label="Company Name"
             placeholder="Enter Company Name"
             value={formData.companyname}
             onChange={(e) => handleChange("companyname", e.target.value)}
-            className="w-[550px]" // Reduced width
-            required
+            required={true}
           />
         </div>
         
@@ -83,85 +86,89 @@ const AddServiceCompanyDetails = () => {
             placeholder="Enter Company Address"
             value={formData.address}
             onChange={(e) => handleChange("address", e.target.value)}
-            className="w-[550px]" // Reduced width
-            required
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+                labelProps={{
+                  className: "before:content-none after:content-none",
+                }}
+
           />
         </div>
          
          <div>
-         <Typography variant="h6" color="blue-gray" className="mb-3">Email <span className="text-red-500">*</span></Typography>
-          <Input
+          <InputField
             type="email"
+            label="Email"
             placeholder="Enter Email"
             value={formData.email}
             onChange={(e) => handleChange("email", e.target.value)}
-            className="w-[550px]" // Reduced width
-            required
+            pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" 
+            required={true}
+            minLength={5}
           />
         </div>
         
         <div>
-        <Typography variant="h6" color="blue-gray" className="mb-3">Phone No <span className="text-red-500">*</span></Typography>
-          <Input
-            placeholder="Enter contact Number"
+          <PhoneInput
             value={formData.phoneno}
             onChange={(e) => handleChange("phoneno", e.target.value)}
-            className="w-[550px]" // Reduced width
-       
+            onBlur={() => {}}
+            // errorMessage={handleErrorMessage}
           />
         </div>
        
         <div> 
-        <Typography variant="h6" color="blue-gray" className="mb-3">Deveice Type <span className="text-red-500">*</span></Typography>
-          <Input
+        
+          <InputField
+            type="text"
+            label="Device Type"
             placeholder="Device Type"
             value={formData.devicetype}
             onChange={(e) => handleChange("devicetype", e.target.value)}
-            className="w-[550px]" // Reduced width
-            required
+            required={true}
           />
         </div>
         
         <div> 
-        <Typography variant="h6" color="blue-gray" className="mb-3">Model <span className="text-red-500">*</span></Typography>
-        <Input
+        
+        <InputField
+          type="text"
+          label="Model"
           placeholder="Model"
           value={formData.model}
           onChange={(e) => handleChange("model", e.target.value)}
-          className="w-[550px]" // Reduced width
-          required
+          required={true}
         />
       </div>
   
        <div>
-       <Typography variant="h6" color="blue-gray" className="mb-3">Serial No <span className="text-red-500">*</span></Typography>
-        <Input
+      
+        <InputField
+          label="Serial No"
+          type="text"
           placeholder="Enter Serial Number"
           value={formData.serialno}
           onChange={(e) => handleChange("serialno", e.target.value)}
-          className="w-[550px]" // Reduced width
+          required={true}
           />
         </div>
  
         <div>
-        <Typography variant="h6" color="blue-gray" className="mb-3">Service Start Date <span className="text-red-500">*</span></Typography>
-          <Input
+          <InputField
             type="date"
+            label="Service Start Date "
             value={formData.servicestartdate}
             onChange={(e) => handleChange("servicestartdate", e.target.value)}
-            className="w-[550px]" // Reduced width
-            required
+            required={true}
           />
         </div>
 
         <div>
-        <Typography variant="h6" color="blue-gray" className="mb-3">Service End Date </Typography>
-          <Input
+          <InputField
             type="date"
+            label="Service End Date "
             value={formData.enddate}
             onChange={(e) => handleChange("enddate", e.target.value)}
-            className="w-[550px]" // Reduced width
-            required
+            required={true}
           />
         </div>
 

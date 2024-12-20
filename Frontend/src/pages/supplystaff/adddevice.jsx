@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button, Input, Typography, Textarea } from "@material-tailwind/react";
-
+import { Button, Typography, Textarea } from "@material-tailwind/react";
+import InputField from "../../components/common/InputField";
 const DeviceInformationForm = () => {
   const [formData, setFormData] = useState({
     devicetype: "",
@@ -53,68 +53,64 @@ const DeviceInformationForm = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <Typography variant="h6" color="blue-gray" className="mb-3">
-            Device Type <span className="text-red-500">*</span>
-          </Typography>
-          <Input
+          <InputField
+            label=" Device Type"
             placeholder="Enter Device Type"
             value={formData.devicetype}
+            type="text"
             onChange={(e) => handleChange("devicetype", e.target.value)}
-            required
+            required={true}
           />
         </div>
 
         <div>
-          <Typography variant="h6" color="blue-gray" className="mb-3">
-            Device Brand <span className="text-red-500">*</span>
-          </Typography>
-          <Input
+          <InputField
+            type="text"
+            label="Device Brand"
             placeholder="Enter Device Brand"
             value={formData.devicebrand}
             onChange={(e) => handleChange("devicebrand", e.target.value)}
-            required
+            required={true}
           />
         </div>
 
         <div>
-          <Typography variant="h6" color="blue-gray" className="mb-3">
-            Model <span className="text-red-500">*</span>
-          </Typography>
-          <Input
+          <InputField
+            type="text"
+            label="Model"
             placeholder="Enter Model"
             value={formData.model}
             onChange={(e) => handleChange("model", e.target.value)}
-            required
+            required={true}
           />
         </div>
 
         <div>
-          <Typography variant="h6" color="blue-gray" className="mb-3">
-            Serial No 
-          </Typography>
-          <Input
+          <InputField
+            type="text"
+            label="Serial No"
             placeholder="Enter Serial Number"
             value={formData.serialno}
-            onChange={(e) => handleChange("serialno", e.target.value)}          
+            onChange={(e) => handleChange("serialno", e.target.value)}  
+            required={true}        
           />
         </div>
 
         <div>
-          <Typography variant="h6" color="blue-gray" className="mb-3">
-            Service Tag 
-          </Typography>
-          <Input
+          <InputField
+            type="text"
+            label="Service Tag"
             placeholder="Enter Service Tag"
             value={formData.servicetag}
             onChange={(e) => handleChange("servicetag", e.target.value)}
+            required={true}
           />
         </div>
 
         <div>
-          <Typography variant="h6" color="blue-gray" className="mb-3">
-            Purchase No 
-          </Typography>
-          <Input
+          <InputField
+            type="text"
+            label="Purchase No"
             placeholder="Enter Purchase Number"
             value={formData.purchaseno}
             onChange={(e) => handleChange("purchaseno", e.target.value)}
@@ -122,10 +118,10 @@ const DeviceInformationForm = () => {
         </div>
 
         <div>
-          <Typography variant="h6" color="blue-gray" className="mb-3">
-            Warranty Period 
-          </Typography>
-          <Input
+          
+          <InputField
+            type="text"
+            label="Warranty Period"
             placeholder="Enter Warranty Period (e.g., 1 Year)"
             value={formData.warrantyperiod}
             onChange={(e) => handleChange("warrantyperiod", e.target.value)}
@@ -133,33 +129,31 @@ const DeviceInformationForm = () => {
         </div>
 
         <div>
-          <Typography variant="h6" color="blue-gray" className="mb-3">
-            Supplier 
-          </Typography>
-          <Input
-            type="Enter Supplier Name"
+          
+          <InputField
+            type="text"
+            label="Supplier"
+            placeholder="Enter Supplier Name"
             value={formData.supplier}
             onChange={(e) => handleChange("supplier", e.target.value)}
           />
         </div>
 
         <div>
-          <Typography variant="h6" color="blue-gray" className="mb-3">
-            Purchase Date 
-          </Typography>
-          <Input
+          
+          <InputField
             type="date"
+            label="Purchase Date"
             value={formData.purchasedate}
             onChange={(e) => handleChange("purchasedate", e.target.value)}
           />
         </div>
 
         <div>
-          <Typography variant="h6" color="blue-gray" className="mb-3">
-            Purchase Cost 
-          </Typography>
-          <Input
+          
+          <InputField
             type="number"
+            label="Purchase Cost"
             placeholder="Enter Purchase Cost"
             value={formData.purchasecost}
             onChange={(e) => handleChange("purchasecost", e.target.value)}
