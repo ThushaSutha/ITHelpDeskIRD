@@ -52,13 +52,7 @@ require('./routes/region.routes')(app);
 require('./routes/unit.routes')(app);
 require('./routes/category.routes')(app);
 require('./routes/device.routes')(app)
-
-
-
-
-
-
-
+require('./routes/company.routes')(app)
 
 app.listen(PORT,()=>{
     console.log(`Server listening on ${PORT}`);
