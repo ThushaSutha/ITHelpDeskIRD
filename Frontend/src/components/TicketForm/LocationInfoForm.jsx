@@ -9,9 +9,12 @@ const LocationInfoForm = ({ handleChange }) => {
   const [selectedUnit, setSelectedUnit] = useState("");
   const [regions, setRegions] = useState([]);
   const [units, setUnits] = useState([]);
+  const [loading, setLoading] = useState({ regions: false, units: false });
+const [error, setError] = useState({ regions: null, units: null });
 
 
   const retrieveRegion = async () => {
+    setLoading((prev) => ({ ...prev, regions: true }));
     try {
       const response = await RegionService.getAll();
       console.log(response.data.data);
@@ -23,12 +26,17 @@ const LocationInfoForm = ({ handleChange }) => {
 
       setRegions(formattedRegions);
     } catch (error) {
+      setError((prev) => ({ ...prev, regions: "Failed to fetch regions" }));
       console.log(error);
+    }finally{
+      setLoading((prev) => ({ ...prev, regions: false }));
+
     }
   };
 
   //fetch region data
   const retrieveUnit = async () => {
+    setLoading((prev) => ({ ...prev, units: true }));
     try {
       const response = await unitService.getAll();
       console.log(response.data.data);
@@ -41,15 +49,39 @@ const LocationInfoForm = ({ handleChange }) => {
       setUnits(formattedUnit);
     } catch (error) {
       console.log(error);
+      setError((prev) => ({ ...prev, units: "Failed to fetch units" }));
+    }finally{
+      setLoading((prev)=> ({...prev, units:false}));
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      const [regionResponse, unitResponse] = await Promise.all([
+        RegionService.getAll(),
+        unitService.getAll(),
+      ]);
+      const formattedRegions = regionResponse.data.data.map((region) => ({
+        label: region.name,
+        value: region.id,
+      }));
+      const formattedUnits = unitResponse.data.data.map((unit) => ({
+        label: unit.name,
+        value: unit.id,
+      }));
+      setRegions(formattedRegions);
+      setUnits(formattedUnits);
+    } catch (error) {
+      console.error("Error fetching data", error);
     }
   };
   
-
   useEffect(() => {
-    retrieveRegion();
-    retrieveUnit();
-    
+    fetchData();
   }, []);
+  
+  
+
 
   return (
     <>
@@ -67,9 +99,9 @@ const LocationInfoForm = ({ handleChange }) => {
                 required={true}
                 value={selectedRegion}
                 onSelectChange={(option) => {
-                  console.log(option.value);
                   setSelectedRegion(option);
-                  handleChange("region", selectedRegion);  
+                  console.log(option);
+                  handleChange("region", option.value);  
                 }}
               />
             </div>
@@ -84,7 +116,8 @@ const LocationInfoForm = ({ handleChange }) => {
                 value={selectedUnit}
                 onSelectChange={(option) => {
                   setSelectedUnit(option);
-                  
+                  console.log(option)
+                  handleChange("unit", option.value);
                 }}
               />
             </div>

@@ -4,6 +4,9 @@ import ContactInfoForm from "../../components/TicketForm/ContactInfoForm";
 import TicketInfoForm from "../../components/TicketForm/TicketInfoForm";
 import LocationInfoForm from "../../components/TicketForm/locationInfoForm";
 import { v4 as uuidv4 } from "uuid";
+import ticketService from "../../services/ticket.service";
+import Toast from "../../components/common/Toast";
+import { toast } from "react-toastify";
 
 const TicketForm = () => {
   const [referenceNumber, setReferenceNumber] = useState("");
@@ -52,9 +55,16 @@ const TicketForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form Data:", formData);
+    // const response = await ticketService.create(formData);
+    // toast.success(response.data.message, {
+    //             position: "top-right",
+    //           });
+    // console.log("Response:", response);
+
+    
   };
 
   return (

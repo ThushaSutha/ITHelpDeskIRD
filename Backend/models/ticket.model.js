@@ -5,9 +5,9 @@ module.exports = (sequelize, Sequelize)=>{
             primaryKey: true,
             autoIncrement: true
         },
-        title:{
-            type: Sequelize.STRING(255),
-            allowNull: false
+        device_id:{
+            type: Sequelize.INTEGER,
+            allowNull: true
         },
         description:{
             type: Sequelize.TEXT,
@@ -21,7 +21,7 @@ module.exports = (sequelize, Sequelize)=>{
         priority:{
             type: Sequelize.TINYINT,
             allowNull: false,
-            defaultValue:0
+            defaultValue:0 // 0- low, 1- medium, 2- high
         },
         user_id:{
             type: Sequelize.INTEGER,
@@ -37,13 +37,25 @@ module.exports = (sequelize, Sequelize)=>{
                 key: 'emId'
             }
         },
+        serial_no:{
+            type: Sequelize.STRING(100),
+            allowNull:true
+        },
+        model:{
+            type: Sequelize.STRING(50),
+            allowNull:true
+        },
+        brand:{
+            type: Sequelize.STRING(50),
+            allowNull:true
+        },
+
         category_id:{
             type: Sequelize.INTEGER,
             references:{
                 model: 'categories',
                 key: 'id'
-            }
-
+            }   
         },
     },{
         tableName:'tickets',

@@ -15,7 +15,7 @@ class TicketService{
     }
 
     create(data){
-        return http.post('/tickets', data);
+        return http.post('/api/tickets', data);
     }
 
     update(data){

@@ -25,6 +25,7 @@ import ManageService from "./pages/supplystaff/manageservicecompany";
 import AddDeviceDetails from "./pages/supplystaff/adddevice";
 
 
+
 function App() {
   return (
     <>
@@ -38,6 +39,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/test" element={<Test />} />
+            
 
 
             {/* Protected Routes */}
@@ -147,6 +149,7 @@ function App() {
           <Route path="/AboutUs" element={<AboutUs />} />
           <Route path="/Contact" element={<Contact />} /> 
           <Route path="/FAQ" element={<FAQ />} /> 
+          
           
           <Route path="/Chatbot" element={<Chatbot />} /> 
 
