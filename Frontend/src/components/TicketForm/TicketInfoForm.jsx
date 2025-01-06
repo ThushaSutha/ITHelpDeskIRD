@@ -5,6 +5,7 @@ import {
   Typography,
   Button,
   Progress,
+  input,
 } from "@material-tailwind/react";
 import InputField from "../common/InputField";
 import Select2LikeComponent from "../common/Select2LikeComponent";
@@ -59,6 +60,11 @@ const TicketInfoForm = ({ handleChange }) => {
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files); // Get the selected files
     const filteredFiles = files.filter((file) => file.size <= 5242880); // Filter files (Max 5MB)
+    console.log("From ticket info form ");
+    if (files){
+      const fileArray = Array.from(files).map((file)=> URL.createObjectURL(file));
+      console.log('image url',fileArray);
+    }
 
     // Update local fileData state
     setFileData((prev) => [...prev, ...filteredFiles]);

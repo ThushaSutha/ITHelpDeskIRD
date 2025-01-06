@@ -3,21 +3,10 @@ const cors = require("cors");
 const fs = require("fs");
 const multer = require("multer");
 const auth = require("./middleware/authJwt");
+const path = require('path');
+const db = require("../Backend/models");
+const images = db.ticket_image;
 
-
-const config = require("./config/auth.config");
-const authenticateToken = require('./config/auth');
-const db = require('./models');
-
-// Ensure the "uploads/" directory exists
-const ensureDirExists = (dir) => {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
-};
-
-// Call this function before the app starts
-ensureDirExists("uploads/");
 
 const app = express();
 
@@ -27,6 +16,48 @@ var corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+//--------------------------------------------------
+// Set up storage using multer
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//       cb(null, 'uploads/'); // Directory where files will be stored
+//     },
+//     filename: (req, file, cb) => {
+//       cb(null, Date.now() + path.extname(file.originalname)); // Unique file name
+//     }
+//   });
+
+  
+// // Create an upload instance with file size limit (e.g., 10MB)
+// const upload = multer({ 
+//     storage,
+//     limits: { fileSize: 10 * 1024 * 1024 } // File size limit of 10MB
+//   });
+
+
+// // Single or multiple file upload endpoint
+// app.post('/upload', upload.array('file', 10), (req, res) => {
+//     if (!req.files) {
+//       return res.status(400).send('No files uploaded');
+//     }else{
+//         console.log("no upload");
+//     }
+  
+//     // Respond with file details
+//     res.send({
+//       message: 'Files uploaded successfully!',
+//       files: req.files
+//     });
+//   });
+
+//   // Create the uploads folder if it doesn't exist
+// const uploadsDir = path.join(__dirname, 'uploads');
+// if (!fs.existsSync(uploadsDir)) {
+//   fs.mkdirSync(uploadsDir);
+// }
+
+//------------------------------------------------------
 
 // Body parsers for JSON and URL-encoded data
 app.use(express.json());
@@ -46,29 +77,23 @@ app.get('/protected', auth.verifyToken, (req, res) => {
     res.send('This is a protected route.');
 });
 
-// Image upload setup
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        return cb(null, "./public/images");
-    },
-    filename: function (req, file, cb) {
-        return cb(null, Date.now() + "-" + file.originalname);
-    },
-});
-const upload = multer({ storage: storage });
+
 
 
 
 // Register other routes
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
-require('./routes/ticket.routes')(app);
+// require('./routes/ticket.routes')(app);
 require('./routes/region.routes')(app);
 require('./routes/unit.routes')(app);
 require('./routes/category.routes')(app);
 require('./routes/device.routes')(app);
 require('./routes/company.routes')(app);
 // require('./routes/image.routes')(app);
+
+const router = require('./routes/ticket.routes')
+app.use('/api/tickets', router)
 
 // Start the server
 app.listen(process.env.PORT || 8080, () => {

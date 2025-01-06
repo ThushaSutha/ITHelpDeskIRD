@@ -1,4 +1,4 @@
-module.exports = app => {
+// module.exports = app => {
 
     const ticket = require('../controllers/ticket.controller');
     var router = require("express").Router();
@@ -31,7 +31,9 @@ module.exports = app => {
 
 
 
-    app.use('/api/tickets',router);
+
+    // app.use('/api/tickets',router);
+    module.exports = router
 
     
-};
+// };

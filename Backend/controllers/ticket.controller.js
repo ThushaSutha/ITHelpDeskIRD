@@ -5,26 +5,31 @@ const Ticket_Image = db.ticket_image;
 const { encrypt, decrypt } = require("../helper/helper");
 const multer = require('multer');
 const path = require('path');
+const fs = require("fs");
 
 // Set up multer storage configuration
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Define where to store the uploaded files
+        cb(null, 'uploads/'); // folder name 
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname)); // Generate unique filename
     }
 });
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+// Multer configuration for multiple file uploads
+exports.upload = multer({ 
+    storage,
+    limits: { fileSize: 10 * 1024 * 1024 } // Limit file size to 10MB
+}); 
 
-const upload = multer({ storage: storage }).single('ticketFile'); // 'ticketFile' is the expected file field name in the form
 
 // Create and save a new ticket
-exports.create = async (req, res) => {
-    upload(req, res, async (err) => {
-        if (err) {
-            return res.status(500).send({ message: "File upload failed", error: err.message });
-        }
+exports.create = [this.upload.array('file',10),async (req, res) => {
 
         const id = req.headers['x-auth-id'];
         const iv = req.headers['x-auth-iv'];
@@ -51,25 +56,34 @@ exports.create = async (req, res) => {
             brand: req.body.brand,
             title: req.body.file,
         };
-        console.log('file',req.body.file[0]);
+        
 
         try {
             const ticketData = await Ticket.create(ticket);
 
-            if (req.file) {
-                const image = {
-                    filePath: req.file.path,
-                    ticket_id: ticketData.id // Use the appropriate field for the foreign key
-                };
-                await Ticket_Image.create(image);
+            if (req.files && req.files.length > 0) {
+                console.log('Image uploaded:', req.files.length);
+                console.log(req.files);
+        
+                // Process and save each uploaded file
+                const images = req.files.map(file => ({
+                    path: file.path, 
+                    ticket_id: ticketData.id,
+                }));
+        
+                // Bulk insert all images into the database
+                await Ticket_Image.bulkCreate(images);
+            } else {
+                console.log("No image uploaded");
             }
 
             res.status(201).send({ message: "Ticket created successfully", data: ticketData });
         } catch (error) {
+            console.log(error);
             res.status(500).send({ message: error.message || "Error creating ticket" });
         }
-    });
-};
+    
+}];
 
 
 
@@ -265,5 +279,4 @@ exports.restoreTicket = (req, res) => {
 exports.deleteAll = (req, res) => {
 
 };
-
 

@@ -15,7 +15,13 @@ class TicketService{
     }
 
     create(data){
-        return http.post('/api/tickets', data);
+        return http.post('/api/tickets', data,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
     }
 
     update(data){
