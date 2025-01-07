@@ -6,7 +6,7 @@ const { encrypt, decrypt } = require("../helper/helper");
 const multer = require('multer');
 const path = require('path');
 const fs = require("fs");
-
+const Op = db.Sequelize.Op;
 // Set up multer storage configuration
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -147,8 +147,17 @@ exports.findByUser = async (req, res) => {
 
     try {
         const decryptId = decrypt(id, iv);
-        var condition = id ? { user_id: { [Op.like]: `%${decryptId}%` } } : null;
+        let condition = " ";
+        if(decryptId === "4" ){
+            console.log("IF") ;
+            condition = decryptId === "4" ? {} : { user_id: decryptId };
+        }else{
+            console.log("ELSE");
+            condition = id ? { user_id: { [Op.like]: `%${decryptId}%` } } : null;
+        }
+        
         console.log("in tiket user_id", decryptId);
+        console.log("condition ",condition);
         const tickets = await Ticket.findAndCountAll({
             where: condition,
             limit: limit,

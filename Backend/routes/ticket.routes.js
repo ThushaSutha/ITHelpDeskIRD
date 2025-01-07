@@ -1,5 +1,7 @@
 // module.exports = app => {
 
+
+    const {authJwt} = require('../middleware');
     const ticket = require('../controllers/ticket.controller');
     var router = require("express").Router();
 

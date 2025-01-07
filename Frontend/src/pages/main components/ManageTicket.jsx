@@ -88,7 +88,7 @@ const Test = () => {
   const retrieveTicket = async (page) => {
     setLoading(true);
     try {
-      const response = await TicketService.getLogTickets();
+      const response = await TicketService.getLogTickets(page,perPage);
       setData(response.data.data || []);
       setFilteredData(response.data.data || []);
       setTotalRows(response.data.totalItems || 0);
@@ -227,6 +227,7 @@ const Test = () => {
 
   useEffect(() => {
     retrieveTicket(1);
+    console.log("Role", localStorage.getItem('userRole'));
   }, [perPage]);
 
   // Define columns

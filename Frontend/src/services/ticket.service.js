@@ -10,8 +10,14 @@ class TicketService{
         return http.get(`/api/tickets/${id}`);
     }
 
-    getLogTickets(){
-        return http.get('api/tickets/log/tickets');
+    getLogTickets(page){
+        // return http.get('api/tickets/log/tickets');
+        const id = localStorage.getItem("Auth");
+        return http.get(`/api/tickets?page=${page}&size=10`,{
+            headers: {
+                'Authorization': `${id}`
+            }
+        });
     }
 
     create(data){

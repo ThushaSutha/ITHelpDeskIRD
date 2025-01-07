@@ -38,14 +38,42 @@ const Header = () => {
           <Link to="/users" className="text-gray-300 hover:text-white transition duration-300">Manage Users</Link>
           <Link to="/tickets" className="text-gray-300 hover:text-white transition duration-300">Manage Tickets</Link>
         </>
-      ) : (
+      ) : role === "staff" ? (
         <>
           {/* Non-admin user-specific links */}
           <Link to="/tickets" className="text-gray-300 hover:text-white transition duration-300">My Ticket</Link>
           <Link to="/new-ticket" className="text-gray-300 hover:text-white transition duration-300">Create Ticket</Link>
-          <Link to="/add-service" className="text-gray-300 hover:text-white transition duration-300">Add Service Com</Link>
-          <Link to="/add-device" className="text-gray-300 hover:text-white transition duration-300">Add Device</Link>
+          {/* <Link to="/add-service" className="text-gray-300 hover:text-white transition duration-300">Add Service Com</Link> */}
+          {/* <Link to="/add-device" className="text-gray-300 hover:text-white transition duration-300">Add Device</Link> */}
           
+        </>
+      ): role === "it_director" ?(
+        <>
+          <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">Dashboard</Link>
+        </>
+      ): role === "it_staff" ? (
+        <>
+          <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">Assign ticket</Link>
+          <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">update status</Link>
+        </>
+      ): role === "it_in_charge" ? (
+        <>
+          <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">Assign Priority</Link>
+          <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">view pending repair requests</Link>
+          <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">Reports</Link>
+        </>
+      ): role === "account_staff" ? (
+        <>
+          <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">View offsite tickets</Link>
+          <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">Add service companies</Link>
+          <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">payment</Link>
+        </>
+      ) : role === "supply_staff" ? (
+        <>
+          <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">Add new IT Equipment</Link>
+        </>
+      ):(
+        <>
         </>
       )}
       {/* Common links for logged-in users */}

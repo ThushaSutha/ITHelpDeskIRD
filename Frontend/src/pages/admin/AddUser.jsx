@@ -40,8 +40,8 @@ const AddUser = ({ isEditMode = false }) => {
   const today = new Date().toISOString().split("T")[0];
   const role = [
     { value: "it_director", label: "IT_Director" },
-    { value: "it_officer", label: "IT_Officer" },
-    { value: "it_team", label: "IT_Team" },
+    { value: "it_staff", label: "IT_Officer" },
+    { value: "it_in_charge", label: "IT_Team" },
     { value: "staff", label: "Staff" },
     { value: "account_staff", label: "Account_Staff" },
     { value: "supply_staff", label: "Supply_Staff" },

@@ -66,9 +66,12 @@ const TicketForm = () => {
 
     try {
       const newFormData = new FormData();
-      for (let i = 0; i < formData.file.length; i++) {
-        newFormData.append('file', formData.file[i]);
+      if(formData.file ){
+        for (let i = 0; i < formData.file.length; i++) {
+          newFormData.append('file', formData.file[i]);
+        }
       }
+      
       newFormData.append('referenceNo', formData.referenceNo);
       newFormData.append('name', formData.name);
       newFormData.append('email', formData.email);
@@ -86,7 +89,6 @@ const TicketForm = () => {
 
       console.log("new form data",newFormData);
       const response = await ticketService.create(newFormData);
-      
       toast.success(response.data.message, { position: "top-right" });
     } catch (error) {
       console.log(error);
