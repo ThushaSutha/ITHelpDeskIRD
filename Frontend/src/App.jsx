@@ -30,6 +30,7 @@ import ManageService from "./pages/supplystaff/manageservicecompany";
 import AddDeviceDetails from "./pages/supplystaff/adddevice";
 import Managedevice from "./pages/supplystaff/managedevice";
 
+
 function App() {
   return (
     <>
@@ -141,7 +142,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+           
             <Route
               path="/users"
               element={
@@ -151,6 +152,8 @@ function App() {
               }
             />
           </Route>
+         
+        
 
           {/* Routes with Blank Layout */}
           <Route element={<BlankLayout />}>
@@ -168,6 +171,7 @@ function App() {
           <Route path="/AboutUs" element={<AboutUs />} />
           <Route path="/Contact" element={<Contact />} />
           <Route path="/FAQ" element={<FAQ />} />
+          <Route path="/Chatbot" element={<Chatbot />} />
 
           <Route path="/Chatbot" element={<Chatbot />} />
         </Routes>

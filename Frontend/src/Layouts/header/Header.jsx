@@ -19,17 +19,15 @@ const Header = () => {
 
   return (
     <header className="p-4 shadow-lg bg-gradient-to-b from-[#14142c] via-[#0f0f55] to-[#151557] border-b-4 border-[#a2c516] w-full top-0 z-10">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between align-bottom">
         {/* Logo and Name Section */}
         <div className="flex items-center">
-          <img src={logoImageSrc} alt="Logo" className="w-24" />
-          <h2 className="text-2xl lg:text-2xl text-white ml-5 font-display font-bold">
-            Sri Lanka Inland Revenue
-          </h2>
+          <img src={logoImageSrc} alt="Logo" className="w-80" />
+         
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex space-x-8 ml-auto">
+        <nav className="hidden lg:flex space-x-10 ml-8">
           <Link to="/" className="text-gray-300 hover:text-white transition duration-300">
             Home
           </Link>
@@ -159,8 +157,8 @@ const Header = () => {
           ) : (
             <>
               {/* Links for Non-logged-in Users */}
-              <Link to="/faq" className="text-gray-300 hover:text-white transition duration-300">FAQ</Link>
-              <Link to="/about-us" className="text-gray-300 hover:text-white transition duration-300">About Us</Link>
+              
+              <Link to="AboutUs" className="text-gray-300 hover:text-white transition duration-300">About Us</Link>
               <Link to="/contact" className="text-gray-300 hover:text-white transition duration-300">Contact</Link>
               <Link
                 to="/signIn"
