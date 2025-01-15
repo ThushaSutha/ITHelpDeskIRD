@@ -6,6 +6,18 @@ const auth = require("./middleware/authJwt");
 const path = require('path');
 const db = require("../Backend/models");
 const images = db.ticket_image;
+const mysql = require('mysql2');
+const dbconfig = require('./config/db.config');
+const database = mysql.createConnection({
+    host: dbconfig.HOST,
+    user: dbconfig.USER,
+    password: dbconfig.PASSWORD,
+    database: dbconfig.DB
+
+});
+
+//for pdf library import 
+const puppeteer = require('puppeteer');
 
 
 const app = express();
@@ -18,44 +30,77 @@ var corsOptions = {
 app.use(cors(corsOptions));
 
 //--------------------------------------------------
-// Set up storage using multer
-// const storage = multer.diskStorage({
-//     destination: (req, file, cb) => {
-//       cb(null, 'uploads/'); // Directory where files will be stored
-//     },
-//     filename: (req, file, cb) => {
-//       cb(null, Date.now() + path.extname(file.originalname)); // Unique file name
-//     }
-//   });
+//for pdf 
+app.use(express.static(__dirname));
 
-  
-// // Create an upload instance with file size limit (e.g., 10MB)
-// const upload = multer({ 
-//     storage,
-//     limits: { fileSize: 10 * 1024 * 1024 } // File size limit of 10MB
-//   });
+app.get('/data', (request, response) => {
+    response.sendFile(__dirname + '/data.html');
+});
+
+app.post('/getData', (request, response) => {
+    database.query('SELECT * FROM tickets', async (error, results) => {
+        response.status(200).json(results);
+    });
+});
+
+async function convertHTMLToPDF(htmlContent, pdfFilePath, margins = { top: '10mm', right: '10mm', bottom: '10mm', left: '10mm' }) {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    // Set the page content
+    await page.setContent(htmlContent);
+    // Generate PDF
+    await page.pdf({ path: pdfFilePath, format: 'A4', margin: margins });
+    // Open the generated PDF file in the default PDF viewer
+    const open = await import('open');
+    await open.default(pdfFilePath);
+    //close the browser
+    await browser.close();
+}
+
+app.get('/convertPDF', async (request, response) => {
+    database.query('SELECT * FROM tickets', async (error, results) => {
+        let html = '';
+        if (results.length > 0) {
+            html += `
+            <table width="100%" border="1" cellpadding="5" cellspacing="0">
+                <tr>
+                    <th width="20%">ID</th>
+                    <th width="10%">Description</th>
+                    <th width="20%">Status</th>
+                    <th width="20%">User ID</th>
+                    <th width="10%">Assigned to</th>
+                    <th width="10%">Category</th>
+                    <th width="10%">Created at</th>
+                </tr>
+            `;
+            results.map((row) => {
+                html += `
+                <tr>
+                    <th>${row.id}</th>
+                    <th>${row.description}</th>
+                    <th>${row.status}</th>
+                    <th>${row.user_id}</th>
+                    <th>${row.assigned_to}</th>
+                    <th>${row.category_id}</th>
+                    <th>${row.createAt}</th>
+                </tr>
+                `;
+            });
+            html += `
+            </table>
+            `;
+        }
+        const date = new Date();
+
+        const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Get month (1-based) and pad with 0
+        const year = date.getFullYear().toString().slice(-2); // Get last two digits of the year
+
+        console.log("New value:", `${month}-${year}`);
+        await convertHTMLToPDF(html, `./public/Report/Ticket/${month}-${year}-data.pdf`);
+    });
+});
 
 
-// // Single or multiple file upload endpoint
-// app.post('/upload', upload.array('file', 10), (req, res) => {
-//     if (!req.files) {
-//       return res.status(400).send('No files uploaded');
-//     }else{
-//         console.log("no upload");
-//     }
-  
-//     // Respond with file details
-//     res.send({
-//       message: 'Files uploaded successfully!',
-//       files: req.files
-//     });
-//   });
-
-//   // Create the uploads folder if it doesn't exist
-// const uploadsDir = path.join(__dirname, 'uploads');
-// if (!fs.existsSync(uploadsDir)) {
-//   fs.mkdirSync(uploadsDir);
-// }
 
 //------------------------------------------------------
 
@@ -66,6 +111,8 @@ app.use(express.static("public"));
 
 // Sync database (don't force unless in development)
 db.sequelize.sync({ alter: false });
+
+
 
 // Routes
 app.get("/", (req, res) => {
@@ -92,7 +139,8 @@ require('./routes/device.routes')(app);
 require('./routes/company.routes')(app);
 // require('./routes/image.routes')(app);
 
-const router = require('./routes/ticket.routes')
+const router = require('./routes/ticket.routes');
+const dbConfig = require("./config/db.config");
 app.use('/api/tickets', router)
 
 // Start the server

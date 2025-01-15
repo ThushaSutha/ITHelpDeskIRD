@@ -7,7 +7,10 @@ module.exports = (sequelize, Sequelize)=>{
         },
         device_id:{
             type: Sequelize.INTEGER,
-            allowNull: true
+            references:{
+                model:'devices',
+                key:'id'
+            }
         },
         description:{
             type: Sequelize.TEXT,

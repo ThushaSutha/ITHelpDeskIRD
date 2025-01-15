@@ -28,6 +28,7 @@ import FAQ from "./pages/main components/FAQ";
 import AddServiceCompanyDetails from "./pages/supplystaff/addservicecompany";
 import ManageService from "./pages/supplystaff/manageservicecompany";
 import AddDeviceDetails from "./pages/supplystaff/adddevice";
+import ReportGenerator from "./pages/it-in-charge/ReportGenerator";
 
 function App() {
   return (
@@ -48,6 +49,17 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/test" element={<Test />} />
+            <Route path="/ticket-report" element={<ReportGenerator />} />
+
+            {/* IT in-charge - 1.Assign Priority 2.Oversee all Tickets 3.Monitor system performance 4. view pending repair requests 5.Generate reports */}
+            <Route
+              path="/ticket-report"
+              element={
+                <ProtectedRoute roles={["it_in_charge", "admin"]}>
+                  <ReportGenerator />
+                </ProtectedRoute>
+              }
+            />
 
             {/*  employee - 1.submit ticket 2.view ticket status 3.Provide feedback */}
             <Route

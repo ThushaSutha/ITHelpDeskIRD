@@ -7,6 +7,9 @@ const multer = require('multer');
 const path = require('path');
 const fs = require("fs");
 const Op = db.Sequelize.Op;
+const User = db.user;
+const Category = db.category;
+const Device = db.device;
 // Set up multer storage configuration
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -92,21 +95,58 @@ exports.findAll = (req, res) => {
     const title = req.query.title;
     var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
 
-    Ticket.findAll({ where: condition })
+    Ticket.findAll({
+        where: condition,
+        include: [
+            {
+                model: User,
+                attributes: ['name']
+            },
+            {
+                model: User,
+                attributes: ['name'],
+                as:'assigned'
+            },
+            {
+                model: Category,
+                attributes: ['name'],
+                as : 'category'
+            },
+            {
+                model: Device,
+                attributes: ['brand','model','brand'],
+                as : 'device'
+            }
+        ]
+    })
         .then(data => {
             res.status(200).send({
                 message: "All tickets retrieved successfully",
-                data: data
+                data: data.map(ticket => ({
+                    id: ticket.id,
+                    description: ticket.description,
+                    status: ticket.status,
+                    user_id: ticket.user_id,
+                    assigned_to:ticket.assigned_to ? ticket.assigned.name:'null' ,
+                    user_name: ticket.user ? ticket.user.name : 'No associated user',
+                    priority: ticket.priority,
+                    category: ticket.category? ticket.category.name:'null',
+                    device: ticket.device? ticket.device.brand:'null',
+                    serial_no: ticket.serial_no,
+                    model: ticket.device? ticket.device.model:'null',
+                    brand: ticket.device? ticket.device.brand:'null',
+                    createdAt: ticket.createdAt
+                }))
             });
         })
         .catch(err => {
             res.status(500).send({
-                message: err.message || "Some error occurred while retrieving tutorials."
+                message: err.message || "Some error occurred while retrieving tickets."
             });
         });
-
-
 };
+
+
 
 //Find a single ticket with an id
 exports.findOne = (req, res) => {
