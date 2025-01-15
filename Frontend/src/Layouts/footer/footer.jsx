@@ -3,9 +3,9 @@ import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-b from-[#d6d6d8]  via-[#f5f5f8] to-[#fcfcfd] text-gray-900 py-6">
+    <footer className="bg-gradient-to-b from-[#d6d6d8]  via-[#f5f5f8] to-[#fcfcfd] text-indigo-900 py-6">
       <div className="container mx-auto text-center">
-        <div className="flex justify-center space-x-6">
+        <div className="flex justify-center space-x-6 ">
           {/* Facebook */}
           <a
             href="https://www.facebook.com"
@@ -36,7 +36,7 @@ const Footer = () => {
             <FaInstagram />
           </a>
         </div>
-        <p className="mt-4 text-sm text-gray-900 ">
+        <p className="mt-4 text-sm text-indigo-900">
           &copy; {new Date().getFullYear()} IT Help Desk Ticketing System - IRD. All rights reserved.
         </p>
       </div>

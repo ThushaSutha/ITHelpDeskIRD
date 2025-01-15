@@ -1,8 +1,8 @@
+
 import PropTypes from 'prop-types';
 import serverIllustrationImageSrc from '../../images/ticket.png';
-
 import Footer from '../../Layouts/footer/footer';
-
+import QuestionCard from './QuestionCard';
 
 
 const Home = ({
@@ -15,25 +15,31 @@ const Home = ({
 
       {/* Main Content Section */}
       <main className="flex-grow flex items-center justify-center">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        
           <div className="text-center md:text-left">
+         
             <h1 className="text-5xl mb-4 pl-6 uppercase font-display1">{heading}</h1>
+            
             {description.split('\n').map((line, index) => (
               <p className="text-lg mb-2 pl-6 font-display3 text-justify" key={index}> 
                 {line}
               </p>
+              
             ))}
           </div>
-          <div className="flex justify-center items-center h-screen p-4" >
+         
+          <div className="flex justify-center items-center h-screen p-2" >
       
             <img
               src={imageSrc}
               alt="Server Illustration"
-              className="  h-[450px]  w-[300px] rounded-lg shadow-lg"
+              className="  h-[400px]  w-[350px] rounded-lg shadow-lg"
             />
            
           </div>
-        </div>       
+          <QuestionCard />
+      
+   
       </main>
       <Footer />
     </div>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import '../../App.css';
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -8,11 +9,12 @@ const Chatbot = () => {
   const handleSend = () => {
     if (input.trim() === "") return;
 
-    // Update messages with the user's input
-    setMessages([...messages, { sender: "User", text: input }]);
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { sender: "User", text: input },
+    ]);
     setInput("");
 
-    // Simulate bot response after a short delay
     setTimeout(() => {
       const botResponse = getBotResponse(input);
       setMessages((prevMessages) => [
@@ -22,20 +24,29 @@ const Chatbot = () => {
     }, 500);
   };
 
-  // Function to simulate bot response
   const getBotResponse = (userInput) => {
-    if (userInput.toLowerCase().includes("hello")) {
+    const lowerCaseInput = userInput.toLowerCase();
+
+    if (lowerCaseInput.includes("hello")) {
       return "Hi there! How can I assist you today?";
     }
+    if (lowerCaseInput.includes("help")) {
+      return "Sure! Please let me know what you need help with.";
+    }
+    if (lowerCaseInput.includes("faq")) {
+      return "Here are some frequently asked questions:\n1. How to reset my password?\n2. How to contact support?\n3. What are your working hours?";
+    }
+    if (lowerCaseInput.includes("bye")) {
+      return "Goodbye! Have a great day!";
+    }
+
     return "I'm here to help! Please ask your question.";
   };
 
-  // Handle input change
   const handleChange = (e) => {
     setInput(e.target.value);
   };
 
-  // Handle pressing Enter to send a message
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSend();
@@ -43,84 +54,33 @@ const Chatbot = () => {
   };
 
   return (
-    <div style={styles.chatbotContainer}>
-      <div style={styles.chatWindow}>
+    <div className="chatbot-container">
+      <h2 className="chatbot-title text-deep-purple-900">Chatbot Assistant</h2>
+      <div className="chat-window">
         {messages.map((msg, index) => (
           <div
             key={index}
-            style={{
-              ...styles.message,
-              alignSelf: msg.sender === "User" ? "flex-end" : "flex-start",
-              backgroundColor: msg.sender === "User" ? "#d1f7c4" : "#f0f0f0",
-            }}
+            className={`message ${msg.sender === "User" ? "user-message" : "bot-message"}`}
           >
             <strong>{msg.sender}:</strong> {msg.text}
           </div>
         ))}
       </div>
-      <div style={styles.inputContainer}>
+      <div className="input-container">
         <input
           type="text"
           value={input}
           onChange={handleChange}
           onKeyPress={handleKeyPress}
           placeholder="Type your message..."
-          style={styles.input}
+          className="chat-input"
         />
-        <button onClick={handleSend} style={styles.sendButton}>
+        <button onClick={handleSend} className="send-button">
           Send
         </button>
       </div>
     </div>
   );
-};
-
-const styles = {
-  chatbotContainer: {
-    width: "400px",
-    margin: "20px auto",
-    border: "1px solid #ccc",
-    borderRadius: "5px",
-    display: "flex",
-    flexDirection: "column",
-    backgroundColor: "#fff",
-    fontFamily: "Arial, sans-serif",
-  },
-  chatWindow: {
-    flex: 1,
-    padding: "10px",
-    overflowY: "auto",
-    maxHeight: "300px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-  },
-  message: {
-    padding: "10px",
-    borderRadius: "10px",
-    maxWidth: "80%",
-    wordWrap: "break-word",
-  },
-  inputContainer: {
-    display: "flex",
-    padding: "10px",
-    borderTop: "1px solid #ccc",
-  },
-  input: {
-    flex: 1,
-    padding: "10px",
-    border: "1px solid #ccc",
-    borderRadius: "5px",
-  },
-  sendButton: {
-    marginLeft: "10px",
-    padding: "10px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
 };
 
 export default Chatbot;

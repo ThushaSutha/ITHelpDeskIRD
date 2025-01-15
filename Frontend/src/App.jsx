@@ -29,18 +29,20 @@ import AddServiceCompanyDetails from "./pages/supplystaff/addservicecompany";
 import ManageService from "./pages/supplystaff/manageservicecompany";
 import AddDeviceDetails from "./pages/supplystaff/adddevice";
 import ReportGenerator from "./pages/it-in-charge/ReportGenerator";
+import Managedevice from "./pages/supplystaff/managedevice";
+
 
 function App() {
   return (
     <>
       {/* Toast Container for Global Notifications */}
       <ToastContainer />
-      {/*  employee - 1.submit ticket 2.view ticket status 3.Provide feedback */}
-      {/*  IT staff 1.Assign ticket 2.update status 3.communication with user 4. Add comments 5.Resolve issues */}
-      {/* Supply Division staff - 1.Add new IT Equipment  */}
-      {/* IT in-charge - 1.Assign Priority 2.Oversee all Tickets 3.Monitor system performance 4. view pending repair requests 5.Generate reports */}
-      {/* IT director - 1.View Dashboard  */}
-      {/* Account branch staff - 1.View offsite tickets 2.Add service companies 3.Assign tickets to Service companies 4.Approve payment for repair */}
+      {/*  Staff - 1.submit ticket 2.view ticket status 3.Provide feedback */}
+      {/*  IT_Team 1.Assign ticket 2.update status 3.communication with user 4. Add comments 5.Resolve issues */}
+      {/* Supply_Division_staff - 1.Add new IT Equipment  */}
+      {/* IT in-charge (IT_Officer) - 1.Assign Priority 2.Oversee all Tickets 3.Monitor system performance 4. view pending repair requests 5.Generate reports */}
+      {/* IT_director - 1.View Dashboard  */}
+      {/* Account_branch_staff - 1.View offsite tickets 2.Add service companies 3.Assign tickets to Service companies 4.Approve payment for repair */}
       <Router>
         <Routes>
           {/* Routes with Main Layout */}
@@ -61,7 +63,7 @@ function App() {
               }
             />
 
-            {/*  employee - 1.submit ticket 2.view ticket status 3.Provide feedback */}
+            {/*  Staff - 1.submit ticket 2.view ticket status 3.Provide feedback */}
             <Route
               path="/new-ticket"
               element={
@@ -70,7 +72,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/tickets"
               element={
@@ -80,17 +81,27 @@ function App() {
               }
             />
 
-            {/*  IT staff 1.Assign ticket 2.update status 3.communication with user 4. Add comments 5.Resolve issues */}
+            {/*  IT_Team 1.Assign ticket 2.update status 3.communication with user 4. Add comments 5.Resolve issues */}
 
             {/* Supply Division staff - 1.Add new IT Equipment  */}
             <Route
               path="/add-device"
               element={
-                <ProtectedRoute roles={["staff", "admin"]}>
+                <ProtectedRoute roles={["staff", "supply_staff"]}>
                   <AddDeviceDetails />
                 </ProtectedRoute>
               }
             />
+            
+            <Route
+              path="/manage-device"
+              element={
+                <ProtectedRoute roles={['staff',"supply_staff"]}>
+                  <Managedevice />
+                </ProtectedRoute>
+              }
+            />  
+
 
             {/* Protected Routes */}
             <Route
@@ -108,13 +119,12 @@ function App() {
                   <Dashboard />
                 </ProtectedRoute>
               }
-            />
-            
+            />            
 
             <Route
               path="/add-service"
               element={
-                <ProtectedRoute roles={["staff", "admin"]}>
+                <ProtectedRoute roles={["staff", "account_staff"]}>
                   <AddServiceCompanyDetails />
                 </ProtectedRoute>
               }
@@ -122,18 +132,16 @@ function App() {
             <Route
               path="/service"
               element={
-                <ProtectedRoute roles={["staff", "admin"]}>
+                <ProtectedRoute roles={["staff", "aaccount_staff"]}>
                   <ManageService />
                 </ProtectedRoute>
               }
-            />
-
-            
+            />     
 
             <Route
               path="/add"
               element={
-                <ProtectedRoute roles={["admin"]}>
+                <ProtectedRoute roles={["admin","it_officier"]}>
                   <AddUser />
                 </ProtectedRoute>
               }
@@ -141,21 +149,23 @@ function App() {
             <Route
               path="/update"
               element={
-                <ProtectedRoute roles={["admin"]}>
+                <ProtectedRoute roles={["admin","it_officier"]}>
                   <AddUser isEditMode={true} />
                 </ProtectedRoute>
               }
             />
-
+           
             <Route
               path="/users"
               element={
-                <ProtectedRoute roles={["admin", "it_staff"]}>
+                <ProtectedRoute roles={["admin", "it_officier"]}>
                   <ManageUser />
                 </ProtectedRoute>
               }
             />
           </Route>
+         
+        
 
           {/* Routes with Blank Layout */}
           <Route element={<BlankLayout />}>
@@ -173,6 +183,7 @@ function App() {
           <Route path="/AboutUs" element={<AboutUs />} />
           <Route path="/Contact" element={<Contact />} />
           <Route path="/FAQ" element={<FAQ />} />
+          <Route path="/Chatbot" element={<Chatbot />} />
 
           <Route path="/Chatbot" element={<Chatbot />} />
         </Routes>

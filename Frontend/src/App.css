@@ -1,50 +1,151 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
+/* Questions Container */
+.questions-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px;
+  flex-wrap: wrap; /* Allow cards to wrap */
+}
+
+/* Questions Card */
+.questions-card {
+  width: 220px;
+  padding: 20px;
+  border: 1px solid #fcfbfb;
+  border-radius: 10px;
   text-align: center;
+  background-color: rgb(244, 251, 252);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  margin-bottom: 20px; /* Spacing below cards */
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.questions-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.questions-card h2 {
+  margin: 10px 0;
+  font-family: 'Roboto', sans-serif; 
+  font-size: 14px;
+  color: #333;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.questions-card button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #af7509;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.card {
-  padding: 2em;
+.questions-card-image {
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+  margin: 0 auto 5px;
+  display: block;
 }
 
-.read-the-docs {
-  color: #888;
+.questions-card button:hover {
+  background-color: #220755;
 }
 
-@import 'datatables.net-dt';
-@import 'datatables.net-responsive-dt';
-@import 'datatables.net-select-dt';
+.chatbot-container {
+  width: 400px;
+  margin: 20px auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
+.chatbot-title {
+  text-align: center;
+  margin: 10px 0;
+  font-size: 20px;
+  font-weight: bold;
+  color:#051144;
+  
+}
 
+.chat-window {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  max-height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
+.message {
+  padding: 12px;
+  border-radius: 10px;
+  max-width: 80%;
+  word-wrap: break-word;
+  font-size: 14px;
+  line-height: 1.4;
+}
 
+.user-message {
+  align-self: flex-end;
+  background-color: #d1f7c4;
+}
+
+.bot-message {
+  align-self: flex-start;
+  background-color: #f0f0f0;
+}
+
+.input-container {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  outline: none;
+}
+
+.send-button {
+  margin-left: 20px;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.send-button:hover {
+  background-color: #0056b3;
+}
