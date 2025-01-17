@@ -51,7 +51,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/test" element={<Test />} />
-            <Route path="/ticket-report" element={<ReportGenerator />} />
+            {/* <Route path="/ticket-report" element={<ReportGenerator />} /> */}
 
             {/* IT in-charge - 1.Assign Priority 2.Oversee all Tickets 3.Monitor system performance 4. view pending repair requests 5.Generate reports */}
             <Route
@@ -138,6 +138,14 @@ function App() {
               }
             />     
 
+            <Route
+              path="/ticket-report"
+              element={
+                <ProtectedRoute roles={["admin","it_in_charge"]}>
+                  <AddUser />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/add"
               element={

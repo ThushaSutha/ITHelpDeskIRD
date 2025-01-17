@@ -114,7 +114,7 @@ exports.findAll = (req, res) => {
             },
             {
                 model: Device,
-                attributes: ['brand','model','brand'],
+                attributes: ['brand','model','device_type'],
                 as : 'device'
             }
         ]
@@ -131,11 +131,12 @@ exports.findAll = (req, res) => {
                     user_name: ticket.user ? ticket.user.name : 'No associated user',
                     priority: ticket.priority,
                     category: ticket.category? ticket.category.name:'null',
-                    device: ticket.device? ticket.device.brand:'null',
+                    device: ticket.device? ticket.device.device_type:'null',
                     serial_no: ticket.serial_no,
                     model: ticket.device? ticket.device.model:'null',
                     brand: ticket.device? ticket.device.brand:'null',
-                    createdAt: ticket.createdAt
+                    createdAt: ticket.createdAt,
+                    updatedAt: ticket.updatedAt
                 }))
             });
         })

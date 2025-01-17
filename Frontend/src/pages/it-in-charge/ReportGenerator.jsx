@@ -1,47 +1,30 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import DataTable from "react-data-table-component";
-import UserService from "../../services/user.service"; // Adjust path based on your project structure
 import LordIconComponent from "../../components/Icons/LordIconComponent"; // Your custom loader
-import LordDeleteIconComponent from "../../components/Icons/LordDeleteIconComponent"; // Your custom loader
-import { Card, CardFooter, Chip, Typography } from "@material-tailwind/react";
+import { Chip, Typography } from "@material-tailwind/react";
 import { Spinner } from "@material-tailwind/react";
-import Avatar from "react-avatar";
 import { format } from "date-fns";
-import { CommentSection } from "react-comments-section";
-import 'react-comments-section/dist/index.css'
-
-import { Popover, PopoverHandler, PopoverContent, Input } from "@material-tailwind/react";
+import "react-comments-section/dist/index.css";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+import { Input } from "@material-tailwind/react";
 import "react-day-picker/dist/style.css";
 
-import {
-  MagnifyingGlassIcon,
-  PencilSquareIcon,
-  ViewfinderCircleIcon,
-  TrashIcon,
-  UserPlusIcon,
-} from "@heroicons/react/24/solid";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
-import {
-  Button,
-  CardBody,
-  Tabs,
-  TabsHeader,
-  Tab,
-  IconButton,
-  Tooltip,
-  Dialog,
-  DialogHeader,
-  DialogBody,
-  DialogFooter,
-} from "@material-tailwind/react";
+import { Button, Tabs } from "@material-tailwind/react";
 
 import "../../styles/style.css";
-import InputField from "../../components/common/InputField";
-import Select2LikeComponent from "../../components/common/Select2LikeComponent";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import TicketService from "../../services/ticket.service";
-import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
+import * as XLSX from "xlsx";
+
+const Export = ({ onExport, name }) => (
+  <Button onClick={() => onExport()}>{name}</Button>
+);
 
 const ReportGenerator = () => {
   const navigate = useNavigate();
@@ -55,48 +38,317 @@ const ReportGenerator = () => {
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
   const [perPage, setPerPage] = useState(10);
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [updateUserData, setUpdateUserData] = useState({
-    name: "",
-    email: "",
-    role: "",
-    unit_id: "",
-    contact: "",
-  });
-  const [selectUnit, setUnitOption] = useState("");
-  const [selectStatus, setStatusOption] = useState("");
-  const units = ["IT", "Accounts", "Network"];
-  const status = ["Active", "Inactive"];
-  const [month, setMonth] = useState(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
-  const handleDateChange = (e) => {
-    const { value } = e.target;
-    
-    console.log("value",value);
-    console.log("Nedw value",new Date(value), "mm-yy");
-    console.log('Month date',month);
-
-    // const text = event.target.value.toLowerCase();
-    setMonth(value);
-    setFilteredData(
-      data.filter((row) => row.createdAt.toLowerCase().includes(value))
-    );
-
-  };
+  // csv file download
+  const convertArrayOfObjectsToCSV = (data) => {
+    if (!data || data.length === 0) {
+      console.error("Data is empty or undefined");
+      return ""; // Return an empty string if there's no data
+    }
   
+    try {
+      // Define columns to ignore
+      const columnsToIgnore = ['description', 'status', 'user_id', 'priority', 'model', 'brand'];
+  
+      // Define header mappings
+      const headerNameMapping = {
+        'id': 'Id',
+        'category': 'Issue Type',
+        'device': 'Device category',
+        'serial_no': 'ServiceTag',
+        'user_name': 'Username',
+        'assigned_to': 'Assigned',
+      };
+  
+      // Define custom column order
+      const customOrder = ['id', 'category', 'device', 'serial_no', 'user_name', 'assigned_to'];
+  
+      // Filter data columns and map headers
+      const filteredHeaders = Object.keys(data[0]).filter(
+        (key) => !columnsToIgnore.includes(key)
+      );
+  
+      const orderedHeaders = customOrder.filter((key) => filteredHeaders.includes(key));
+      const mappedHeaders = orderedHeaders.map(
+        (header) => headerNameMapping[header] || header
+      );
+  
+      // Generate CSV content
+      const csv = [
+        mappedHeaders.join(","), // Add column headers
+        ...data.map((row) =>
+          orderedHeaders
+            .map((header) => `"${row[header] !== undefined ? row[header] : ""}"`) // Extract and quote values
+            .join(",")
+        ),
+      ].join("\n");
+  
+      return csv;
+    } catch (error) {
+      console.error("Error generating CSV:", error);
+      return ""; // Handle unexpected errors gracefully
+    }
+  };
 
- 
+  const handleExport = () => {
+    const csvContent = convertArrayOfObjectsToCSV(filteredData);
+  
+    if (csvContent) {
+      const blob = new Blob([csvContent], { type: "text/xlsx;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+  
+      link.setAttribute("href", url);
+      link.setAttribute("download", `report_${new Date().toISOString()}.xlsx`);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      alert("No data available to export as CSV.");
+    }
+  };
 
+  const handleExportPDF = () => {
+    if (!filteredData || filteredData.length === 0) {
+      alert("No data available to export.");
+      return;
+    }
+
+    const columnsToIgnore = ['description', 'status','user_id','priority','model','brand']; // Replace with the columns you want to ignore
+
+    const headerNameMapping = {
+      'id': 'Id',  // Original column name -> New header name
+      'category': 'Issue Type',
+      'device': 'Device category',
+      'serial_no': 'ServiceTag',
+      'user_name': 'Username',
+      'assigned_to': 'Assigned',
+      // Add more mappings as necessary
+    };
+
+    const filteredHeaders = Object.keys(filteredData[0])
+      .filter(key => !columnsToIgnore.includes(key));
+
+    const mappedHeaders = filteredHeaders.map(header => headerNameMapping[header] || header);
+
+
+    // Define the custom order for the headers (adjust this order as needed)
+    const customOrder = ['id', 'category', 'device','serial_no','user_name','assigned_to']; // Example: the new order of the columns
+
+    // Filter the headers to exclude columns you don't want
+    
+
+    // Rearrange the filtered headers to match the custom order
+    // Rearrange the mapped headers according to the custom order
+    const orderedMappedHeaders = customOrder.filter(column => filteredHeaders.includes(column))
+      .map(header => headerNameMapping[header] || header);
+
+
+
+
+    // Filter each row's values based on the new ordered headers
+    const filteredRows = filteredData.map(row => {
+      return customOrder.map(header => row[header]);
+    });
+
+    console.log("filtered Data",filteredData);
+
+    const nonResolvedTicketsCount = filteredData.filter(row => row.status === 0).length;
+    const resolvedTicketsCount = filteredData.filter(row => row.status === 1).length;
+
+    const doc = new jsPDF({
+      orientation: 'l',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    //font family
+    doc.setFont('times');
+    // Add a title
+    doc.text("Ticket State Report", 125, 10); 
+    
+    doc.setFontSize(12);
+    doc.text("Duration: " , 10, 20);
+    doc.setFontSize(9);
+    doc.text(format(new Date(startDate), "dd MMM yyyy")+" to " + format(new Date(endDate), "dd MMM yyyy"), 35, 20);
+
+    doc.setFontSize(12);
+    doc.text("Total Tickets: " , 10, 30);
+    doc.setFontSize(9);
+    doc.text(filteredRows.length.toString(), 35, 30);
+
+    //Resolved Tickets
+    doc.setFontSize(12);
+    doc.text("Non resolved Tickets: " , 200, 20);
+    doc.setFontSize(9);
+    doc.text(nonResolvedTicketsCount.toString(), 240, 20);
+
+    doc.setFontSize(12);
+    doc.text("Resolved Tickets: " , 200, 30);
+    doc.setFontSize(9);
+    doc.text(resolvedTicketsCount.toString(), 240, 30);
+    
+
+    // Add the table
+    doc.autoTable({
+      head: [orderedMappedHeaders], // Use the ordered headers
+      body: filteredRows,
+      startY: 50,
+    });
+
+    // Save the PDF
+    doc.save(`report_${new Date().toISOString()}.pdf`);
+};
+
+
+
+const handleExportExcel = async () => {
+  if (!filteredData || filteredData.length === 0) {
+    alert("No data available to export.");
+    return;
+  }
+
+  const columnsToIgnore = ['description', 'status', 'user_id', 'priority', 'model', 'brand'];
+
+  const headerNameMapping = {
+    id: 'Id',
+    category: 'Issue Type',
+    device: 'Device Category',
+    serial_no: 'ServiceTag',
+    user_name: 'Username',
+    assigned_to: 'Assigned',
+  };
+
+  const customOrder = ['id', 'category', 'device', 'serial_no', 'user_name', 'assigned_to'];
+
+  const filteredHeaders = Object.keys(filteredData[0]).filter(
+    (key) => !columnsToIgnore.includes(key)
+  );
+
+  const orderedHeaders = customOrder.filter((key) => filteredHeaders.includes(key));
+  const mappedHeaders = orderedHeaders.map(
+    (header) => headerNameMapping[header] || header
+  );
+
+  const formattedRows = filteredData.map((row) =>
+    customOrder.reduce((acc, key) => {
+      if (!columnsToIgnore.includes(key)) {
+        acc[headerNameMapping[key] || key] = row[key];
+      }
+      return acc;
+    }, {})
+  );
+
+  const nonResolvedTicketsCount = filteredData.filter(row => row.status === 0).length;
+  const resolvedTicketsCount = filteredData.filter(row => row.status === 1).length;
+  
+  // Create a new workbook and worksheet
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Ticket Report');
+
+    // Add a title row
+  const titleRow = worksheet.addRow(['Ticket State Report']);
+
+    // Merge cells for the title row
+  worksheet.mergeCells('A1:F1'); 
+
+  // Style the title row
+  titleRow.getCell(1).font = {
+    name: 'Arial',
+    size: 16,
+    bold: true,
+    color: { argb: 'FFFFFFFF' }, // White text
+  };
+
+  titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+  titleRow.getCell(1).fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: '0070C0' }, // Blue background
+  };
+
+  const duration = worksheet.addRow(["Duration: "+ startDate+ " to " + endDate,"","","","","Non resolved Tickets: "+nonResolvedTicketsCount]);
+  const total = worksheet.addRow(['Total Tickets: '+ filteredData.length.toString(),'','','','','Resolved Tickets: '+ resolvedTicketsCount])
+  // const nonResolvedTicketsCount = worksheet.add(["Duration: "]);
+
+
+  // Add header row with styling
+  const headerRow = worksheet.addRow(mappedHeaders);
+  headerRow.eachCell((cell) => {
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF0070C0' }, // Blue background
+    };
+    cell.font = {
+      color: { argb: 'FFFFFFFF' }, // White text
+      bold: true,
+    };
+    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    cell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' },
+    };
+  });
+
+  // Add data rows
+  formattedRows.forEach((rowData) => {
+    worksheet.addRow(Object.values(rowData));
+  });
+
+  // Auto-fit column widths
+  worksheet.columns.forEach((column) => {
+    const maxLength = column.values.reduce((max, curr) => {
+      const text = curr ? curr.toString() : '';
+      return Math.max(max, text.length);
+    }, 10); // Default column width
+    column.width = maxLength + 2;
+  });
+
+  // Generate Excel file and trigger download
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  saveAs(blob, `report_${new Date().toISOString()}.xlsx`);
+};
+
+
+
+
+
+  // Handle date range change
+  const handleDateRangeChange = () => {
+    if (!startDate || !endDate) {
+      alert("Please select both start and end dates.");
+      return;
+    }
+
+    const adjustedEndDate = new Date(endDate);
+    adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);
+    console.log("start date", startDate);
+    console.log("end date", endDate);
+    console.log("Adjusted end date", adjustedEndDate);
+
+    setFilteredData(
+      data.filter((row) => {
+        const rowDate = new Date(row.createdAt);
+        return rowDate >= new Date(startDate) && rowDate < adjustedEndDate; // Exclusive end date
+      })
+    );
+  };
 
   // Fetch user data
   const retrieveTicket = async (page) => {
     setLoading(true);
     try {
-      const response = await TicketService.getLogTickets(page,perPage);
+      const response = await TicketService.getLogTickets(page, perPage);
       setData(response.data.data || []);
       setFilteredData(response.data.data || []);
       setTotalRows(response.data.totalItems || 0);
-      console.log(response.data.data);
     } catch (error) {
       console.error("Error fetching data:", error);
       setData([]);
@@ -107,18 +359,14 @@ const ReportGenerator = () => {
   };
 
   //pdf generator
-  const handleGenerate = async () =>{
-    try {
-      const response = await axios.get("http://localhost:8080/convertPDF");
-      console.log("response",response);
-    } catch (error) {
-      console.log("error",error);
-    }
-  }
-
-  const deleteHandleOpen = () => {
-    setDeleteOpen(!deleteOpen);
-  };
+  // const handleGenerate = async () => {
+  //   try {
+  //     const response = await axios.get("http://localhost:8080/convertPDF");
+  //     console.log("response", response);
+  //   } catch (error) {
+  //     console.log("error", error);
+  //   }
+  // };
 
   // Handle page change
   const handlePageChange = (page) => {
@@ -131,30 +379,6 @@ const ReportGenerator = () => {
     retrieveTicket(1); // Reset to page 1 when page size changes
   };
 
-
-  // Handlers for Action Buttons
-  const handleView = (row) => {
-    setSelectedRow(row);
-    setViewOpen(!viewOpen);
-    console.log("Edit clicked for row:", row);
-  };
-
-  const handleUpdate = (row) => {
-    console.log("ussssser id", row.emId);
-    navigate("/update", { state: { userId: row.emId } });
-    console.log("Update clicked for row:", row.emId);
-  };
-
-
- 
-
-  const handleDelete = (id) => {
-    setDeleteOpen(!deleteOpen);
-    setSelectedRow(id);
-  };
-
-  
-
   //filter rows based on filter text
   const handleFilter = (event) => {
     const text = event.target.value.toLowerCase();
@@ -166,70 +390,77 @@ const ReportGenerator = () => {
 
   useEffect(() => {
     retrieveTicket(1);
-    console.log("Role", localStorage.getItem('userRole'));
+    console.log("Role", localStorage.getItem("userRole"));
   }, [perPage]);
 
   // Define columns
   const columns = [
     {
-      name: "#",
-      cell: (row, index) => <span>{index + 1}</span>,
+      name: "ID",
+      cell: (row) => row.id,
     },
     {
-      name: "Title",
-      selector: (row) => row.title,
+      name: "Issue Type",
+      selector: (row) => row.category,
     },
     {
-      name: "Description",
-      selector: (row) => row.description,
+      name: "Device Category",
+      selector: (row) => row.device,
     },
     {
-      name: "Priority",
-      cell: (row) => (
-        <>
-          <Chip
-            color={
-              row.priority === 0 ? "cyan" : row.priority === 1 ? "teal" : "pink"
-            }
-            value={
-              row.priority === 0
-                ? "Low"
-                : row.priority === 1
-                ? "Medium"
-                : "High"
-            }
-          />
-        </>
-      ),
+      name: "Service Tag",
+      selector: (row) => row.serial_no,
     },
     {
-      name: "Status",
-      cell: (row) => (
-        <>
-          <Chip
-            color={row.status_id === 1 ? "green" : "red"}
-            value={row.status_id === 1 ? "Active" : "Inactive"}
-          />
-        </>
-      ),
+      name: "Branch",
+      selector: (row) => row.branch,
     },
+    {
+      name: "Unit",
+      selector: (row) => row.branch,
+    },
+    {
+      name: "User name",
+      selector: (row) => row.user_name,
+    },
+    {
+      name: "Assigned To",
+      selector: (row) => row.assigned_to,
+    },
+    // {
+    //   name: "Priority",
+    //   cell: (row) => (
+    //     <>
+    //       <Chip
+    //         color={
+    //           row.priority === 0 ? "cyan" : row.priority === 1 ? "teal" : "pink"
+    //         }
+    //         value={
+    //           row.priority === 0
+    //             ? "Low"
+    //             : row.priority === 1
+    //             ? "Medium"
+    //             : "High"
+    //         }
+    //       />
+    //     </>
+    //   ),
+    // },
+    // {
+    //   name: "Status",
+    //   cell: (row) => (
+    //     <>
+    //       <Chip
+    //         color={row.status_id === 1 ? "green" : "red"}
+    //         value={row.status_id === 1 ? "Active" : "Inactive"}
+    //       />
+    //     </>
+    //   ),
+    // },
     {
       name: "Created At",
       selector: (row) =>
         format(new Date(row.createdAt), "dd MMM yyyy, hh:mm a"),
-    },
-  ];
-
-  const comData = [
-    {
-      userId: "02b",
-      comId: "017",
-      fullName: "Lily",
-      userProfile: "https://www.linkedin.com/in/riya-negi-8879631a9/",
-      text: "I think you have a point🤔",
-      avatarUrl: "https://ui-avatars.com/api/name=Lily&background=random",
-      timestamp: "2024-10-28T12:34:56Z",
-      replies: [],
     },
   ];
 
@@ -246,15 +477,15 @@ const ReportGenerator = () => {
                 {/* Tickets Report */}
               </Typography>
             </div>
-            <div className="basis-2/12 ">
-              
-                <Button className="flex  items-center " size="sm"
-                  onClick={handleGenerate}
-                >
-                  {/* <UserPlusIcon className="h-6 w-6 text-white" /> */}
-                  Generate
-                </Button>
-  
+            <div className="basis-1/12 ">
+              <div>
+                <Export onExport={handleExportExcel} name="Excel" /> 
+              </div>
+            </div>
+            <div className="basis-1/12 ">
+              <div>
+                <Export onExport={handleExportPDF} name="PDF" />
+              </div>
             </div>
           </div>
 
@@ -267,20 +498,36 @@ const ReportGenerator = () => {
                   </Tab>
                 ))}
               </TabsHeader> */}
-
-<div className="flex justify-center">
-                    <input
-                      type="date"
-                      name="expiryDate"
-                      value={month}
-                      onChange={handleDateChange}
-                    //   min={today}
-                      className="mt-2 p-2  border border-gray-300 rounded"
-                      required
-                    />
-                  </div>
-
-    
+              <div className="flex flex-col md:flex-row gap-4 items-center">
+                <div>
+                  <label htmlFor="startDate">Start Date</label>
+                  <input
+                    type="date"
+                    id="startDate"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="mt-2 p-2 border border-gray-300 rounded"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="endDate">End Date</label>
+                  <input
+                    type="date"
+                    id="endDate"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="mt-2 p-2 border border-gray-300 rounded"
+                    required
+                  />
+                </div>
+                <button
+                  onClick={handleDateRangeChange}
+                  className="btn-primary mt-4 md:mt-0 p-2 rounded bg-blue-500 text-white"
+                >
+                  Filter
+                </button>
+              </div>
               
             </Tabs>
             <div className="w-full md:w-72">
@@ -320,8 +567,6 @@ const ReportGenerator = () => {
           </div>
         </div>
       </div>
-
-     
     </>
   );
 };
