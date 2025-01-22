@@ -30,6 +30,7 @@ import ManageService from "./pages/supplystaff/manageservicecompany";
 import AddDeviceDetails from "./pages/supplystaff/adddevice";
 import ReportGenerator from "./pages/it-in-charge/ReportGenerator";
 import Managedevice from "./pages/supplystaff/managedevice";
+import KpiCard from "./pages/it-in-charge/KpiCard"
 
 
 function App() {
@@ -50,8 +51,8 @@ function App() {
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route path="/test" element={<Test />} />
-            {/* <Route path="/ticket-report" element={<ReportGenerator />} /> */}
+            <Route path="/test" element={<KpiCard />} />
+
 
             {/* IT in-charge - 1.Assign Priority 2.Oversee all Tickets 3.Monitor system performance 4. view pending repair requests 5.Generate reports */}
             <Route
