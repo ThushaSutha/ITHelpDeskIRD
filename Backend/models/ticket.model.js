@@ -19,7 +19,7 @@ module.exports = (sequelize, Sequelize)=>{
         status:{
             type: Sequelize.TINYINT,
             allowNull:false,
-            defaultValue: 0
+            defaultValue: 0 //0-open , 1 - pending , 2-closed
         },
         priority:{
             type: Sequelize.TINYINT,
