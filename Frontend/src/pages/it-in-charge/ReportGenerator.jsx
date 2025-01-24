@@ -358,15 +358,6 @@ const handleExportExcel = async () => {
     }
   };
 
-  //pdf generator
-  // const handleGenerate = async () => {
-  //   try {
-  //     const response = await axios.get("http://localhost:8080/convertPDF");
-  //     console.log("response", response);
-  //   } catch (error) {
-  //     console.log("error", error);
-  //   }
-  // };
 
   // Handle page change
   const handlePageChange = (page) => {

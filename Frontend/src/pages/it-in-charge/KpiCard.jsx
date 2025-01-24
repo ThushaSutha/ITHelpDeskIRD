@@ -20,6 +20,7 @@ import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import { formatters } from "date-fns";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+// import { newDate } from "react-datepicker/dist/date_utils";
 
 
 
@@ -99,14 +100,16 @@ function KpiCard1() {
     if (option === "Custom" && startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
-      const diffTime = Math.abs(end - start);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Get the difference in days
-  
-      // Check if the dates are valid and the range doesn't exceed 30 days
+      end.setDate(end.getDate() + 1);
       if (isNaN(start) || isNaN(end)) {
         alert("Please select valid dates.");
         return;
       }
+
+      const diffTime = Math.abs(end - start);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Get the difference in days
+  
+      // Check if the dates are valid and the range doesn't exceed 30 days
   
       if (diffDays > 30) {
         alert("The date range cannot exceed 30 days");
@@ -124,18 +127,17 @@ function KpiCard1() {
       });
     } else {
       // Handle other options like "Last 24 Hours", "Today", "Last 7 days", etc.
+      console.log("option",option);
       switch (option) {
-        case "Last 24 Hours":
-          filteredTickets = tickets.filter((ticket) => {
-            const ticketDate = new Date(ticket.createdAt);
-            return (currentDate - ticketDate) <= 24 * 60 * 60 * 1000; // 24 hours in ms
-          });
-          break;
+        
         case "Last 7 days":
           filteredTickets = tickets.filter((ticket) => {
             const ticketDate = new Date(ticket.createdAt);
             return (currentDate - ticketDate) <= 7 * 24 * 60 * 60 * 1000; // 7 days in ms
           });
+          console.log("7 days",filteredTickets)
+          setStartDate(null);
+          setEndDate(null);
           break;
         case "Today":
           filteredTickets = tickets.filter((ticket) => {
@@ -143,10 +145,64 @@ function KpiCard1() {
             return ticketDate.toDateString() === currentDate.toDateString();
           });
           break;
+        case "Yesterday":
+          filteredTickets = tickets.filter((ticket) => {
+            const ticketDate = new Date(ticket.createdAt);
+            
+            // Reset time to midnight for both ticket and current date
+            const resetTicketDate = new Date(ticketDate.setHours(0, 0, 0, 0));
+            const resetCurrentDate = new Date(currentDate.setHours(0, 0, 0, 0));
+            
+            // Subtract 1 day from the current date to get yesterday
+            resetCurrentDate.setDate(resetCurrentDate.getDate() - 1);
+            
+            // Compare if the ticket date is yesterday
+            return resetTicketDate.toDateString() === resetCurrentDate.toDateString();
+          });
+          break;
         case "Last 30 days":
           filteredTickets = tickets.filter((ticket) => {
             const ticketDate = new Date(ticket.createdAt);
             return (currentDate - ticketDate) <= 30 * 24 * 60 * 60 * 1000; // 30 days in ms
+          });
+          setStartDate(null);
+          setEndDate(null);
+          break;
+        case "Last month":
+          {
+            const firstDayOfLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+            const lastDayOfLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0); // Correctly calculates the last day of the last month
+            lastDayOfLastMonth.setDate(lastDayOfLastMonth.getDate() + 1);
+          
+            // Ensure lastDayOfLastMonth is set correctly (for example, if it's December, it should return December 31st)
+            filteredTickets = tickets.filter((ticket) => {
+              const ticketDate = new Date(ticket.createdAt);
+              return ticketDate >= firstDayOfLastMonth && ticketDate <= lastDayOfLastMonth;
+            });
+        
+            console.log("last month", filteredTickets);
+        
+            setStartDate(null);
+            setEndDate(null);
+          }
+          break;
+        case "Current month":
+          filteredTickets = tickets.filter((ticket) => {
+            const ticketDate = new Date(ticket.createdAt);
+            const firstDayOfCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const lastDayOfCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+            return ticketDate >= firstDayOfCurrentMonth && ticketDate <= lastDayOfCurrentMonth;
+          });
+          break;
+        
+        case "Current week":
+          filteredTickets = tickets.filter((ticket) => {
+            const ticketDate = new Date(ticket.createdAt);
+            const startOfWeek = new Date(currentDate);
+            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            return ticketDate >= startOfWeek && ticketDate <= endOfWeek;
           });
           break;
         default:
@@ -197,8 +253,34 @@ function KpiCard1() {
   }, []);
 
   useEffect(() => {
-    filterData(ticketData, selectedOption); // Re-filter data whenever the selected option changes
-  }, [selectedOption, ticketData]);
+    const debounce = setTimeout(() => {
+      if (selectedOption === "Custom") {
+        filterData(ticketData, selectedOption);
+      }
+      if (selectedOption === "Last 30 days") {
+        filterData(ticketData, selectedOption);
+      }
+      if (selectedOption === "Last 7 days") {
+        filterData(ticketData, selectedOption);
+      }
+      if (selectedOption === "Last month") {
+        filterData(ticketData, selectedOption);
+      }
+      if (selectedOption === "Today") {
+        filterData(ticketData, selectedOption);
+      }
+      if (selectedOption === "Yesterday") {
+        filterData(ticketData, selectedOption);
+      }
+      if (selectedOption === "Current month") {
+        filterData(ticketData, selectedOption);
+      }
+      if (selectedOption === "Current week") {
+        filterData(ticketData, selectedOption);
+      }
+    }, 300);
+    return () => clearTimeout(debounce);
+  }, [ticketData,startDate,endDate,selectedOption]);
 
   const kpiData = [
     {
@@ -251,25 +333,6 @@ function KpiCard1() {
     },
   ];
   
-  // const tData = [4000, 3000, 2000];
-  // console.log("tData",ticketData.filter((data)=>data.id));
-  // const uData = [2400, 1398, 9800, ];
-  // const pData = [1400, 3398, 9800, ];
-  // const cData = [2000, 1798, 7800, 5908, 2800, 1800, 2300,4000, 3000, 2000, 2780, 1890];
-  // const xLabels = [
-  //   "Jan",
-  //   "Feb",
-  //   "Mar",
-  //   "Apr",
-  //   "May",
-  //   "Jun",
-  //   "Jul",
-  //   "Aug",
-  //   "Sep",
-  //   "Oct",
-  //   "Nov",
-  //   "Dec",
-  // ];
   
   const dataset = [
     {
@@ -308,6 +371,19 @@ function KpiCard1() {
       month: "May",
     },
   ];
+
+  console.log("ticket datas",ticketData);
+  const categoryData = ticketData.reduce((acc, ticket) => {
+    const category = ticket.category;
+    if (acc[category]) {
+      acc[category].count += 1;
+    } else {
+      acc[category] = { name: category, count: 1 };
+    }
+    return acc;
+  }, {});
+  const categoryArray = Object.values(categoryData);
+  console.log(categoryArray);
   
   
   return (
@@ -339,15 +415,23 @@ function KpiCard1() {
               </Button>
             </MenuHandler>
             <MenuList>
-              <MenuItem onClick={() => setSelectedOption("Last 24 Hours")}>Last 24 Hours</MenuItem>
-              <MenuItem onClick={() => setSelectedOption("Today")}>Today</MenuItem>
-              <MenuItem onClick={() => setSelectedOption("Yesterday")}>Yesterday</MenuItem>
-              <MenuItem onClick={() => setSelectedOption("Last 7 days")}>Last 7 days</MenuItem>
-              <MenuItem onClick={() => setSelectedOption("Last 30 days")}>Last 30 days</MenuItem>
-              <MenuItem onClick={() => setSelectedOption("Current week")}>Current week</MenuItem>
-              <MenuItem onClick={() => setSelectedOption("Current month")}>Current month</MenuItem>
-              <MenuItem onClick={() => setSelectedOption("Last month")}>Last month</MenuItem>
-              <MenuItem onClick={() => { setSelectedOption("Custom"); setIsCustom(true); }}>Custom</MenuItem>
+              <MenuItem onClick={() => {setSelectedOption("Today"); setIsCustom(false);}}>Today</MenuItem>
+              <MenuItem onClick={() => {setSelectedOption("Yesterday"); setIsCustom(false);}}>Yesterday</MenuItem>
+              <MenuItem onClick={() => {setSelectedOption("Last 7 days"); setIsCustom(false);}}>Last 7 days</MenuItem>
+              <MenuItem onClick={() => {setSelectedOption("Last 30 days"); setIsCustom(false);setStartDate(null);setEndDate(null);}}>Last 30 days</MenuItem>
+              <MenuItem onClick={() => {setSelectedOption("Current week"); setIsCustom(false);}}>Current week</MenuItem>
+              <MenuItem onClick={() => {setSelectedOption("Current month"); setIsCustom(false);}}>Current month</MenuItem>
+              <MenuItem onClick={() => {setSelectedOption("Last month"); setIsCustom(false);}}>Last month</MenuItem>
+              <MenuItem onClick={() => { 
+                const newDate = new Date();
+                const startDate = new Date(newDate)
+                startDate.setDate(newDate.getDate() - 29); 
+                setSelectedOption("Custom"); 
+                setIsCustom(true); 
+                setStartDate(startDate);
+                setEndDate(newDate);
+                
+                }}>Custom</MenuItem>
             </MenuList>
           </Menu>
         </div>
@@ -397,10 +481,10 @@ function KpiCard1() {
               <hr />
             </Typography>
             <BarChart
-              dataset={dataset}
-              yAxis={[{ disableLine:true,disableTicks:true,scaleType: "band", dataKey: "issues" }]}
+              dataset={categoryArray}
+              yAxis={[{ disableLine:true,disableTicks:true,scaleType: "band", dataKey: "name" }]}
               series={[
-                { dataKey: "seoul" },
+                { dataKey: "count" },
               ]}
               layout="horizontal"
               xAxis={[
