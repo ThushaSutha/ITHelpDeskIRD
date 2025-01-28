@@ -49,7 +49,7 @@ db.device.hasMany(db.ticket,{foreignKey:"device_id"});
 db.ticket.belongsTo(db.device,{foreignKey:"device_id",as:"device"});
 
 db.ticket.hasMany(db.ticket_image,{foreignKey:"ticket_id"});
-db.ticket_image.belongsTo(db.ticket,{foreignKey:"ticket_id",as : 'ticket'});
+db.ticket_image.belongsTo(db.ticket,{foreignKey:"ticket_id",as : 'image'});
 
 db.company.hasMany(db.device,{foreignKey:'company_id'});
 db.device.belongsTo(db.company,{foreignKey:'company_id', as : 'company'});
@@ -60,6 +60,7 @@ db.ticket.belongsTo(db.user, { foreignKey: 'user_id' });
 
 db.user.hasMany(db.ticket, { foreignKey: 'assigned_to' });
 db.ticket.belongsTo(db.user, { foreignKey: 'assigned_to' ,as:'assigned'});
+
 
 
 

@@ -36,6 +36,7 @@ exports.create = [this.upload.array('file',10),async (req, res) => {
 
         const id = req.headers['x-auth-id'];
         const iv = req.headers['x-auth-iv'];
+        const serverUrl = 'http://localhost:8080';
 
         if (!id || !iv) {
             return res.status(400).send({ message: "Missing authentication token or IV" });
@@ -70,7 +71,7 @@ exports.create = [this.upload.array('file',10),async (req, res) => {
         
                 // Process and save each uploaded file
                 const images = req.files.map(file => ({
-                    path: file.path, 
+                    path: `${serverUrl}/${path.join(file.path).replace(/\\/g, '/')}`, 
                     ticket_id: ticketData.id,
                 }));
         
@@ -116,6 +117,11 @@ exports.findAll = (req, res) => {
                 model: Device,
                 attributes: ['brand','model','device_type'],
                 as : 'device'
+            },
+            {
+                model: Ticket_Image,
+                attributes:['path','id'],
+                as : 'ticket_images'
             }
         ]
     })
@@ -130,11 +136,13 @@ exports.findAll = (req, res) => {
                     assigned_to:ticket.assigned_to ? ticket.assigned.name:'null' ,
                     user_name: ticket.user ? ticket.user.name : 'No associated user',
                     priority: ticket.priority,
+                    category_id: ticket.category_id,
                     category: ticket.category? ticket.category.name:'null',
                     device: ticket.device? ticket.device.device_type:'null',
                     serial_no: ticket.serial_no,
                     model: ticket.device? ticket.device.model:'null',
                     brand: ticket.device? ticket.device.brand:'null',
+                    file: ticket.ticket_images? ticket.ticket_images:'null',
                     createdAt: ticket.createdAt,
                     updatedAt: ticket.updatedAt
                 }))

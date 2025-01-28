@@ -110,28 +110,6 @@ const AddUser = ({ isEditMode = false }) => {
     return password;
   };
 
-  
-  //fetch user data
-  // const retrieveUser = async (id) => {
-  //   try {
-  //     const response = await userService.get(id);
-  //     console.log("Fetched user data:", response.data.data);
-  //     // setData(response.data.data); // Store only the relevant data4
-  //     setFormData({
-  //       ...formData,
-  //       fullName: response.data.data.name,
-  //       email: response.data.data.email,
-  //       phoneNumber: response.data.data.contact,
-  //       userRole: response.data.data.role,
-  //       region: response.data.data.region,
-  //       unit: response.data.data.unit,
-  //       status: response.data.data.status,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error fetching user data:", error);
-  //   }
-  // };
-
   //fetch region data
   const retrieveRegion = async () => {
     try {

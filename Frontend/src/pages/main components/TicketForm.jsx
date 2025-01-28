@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 import ticketService from "../../services/ticket.service";
 import Toast from "../../components/common/Toast";
 import { toast } from "react-toastify";
-import axios from "axios";
 
 const TicketForm = () => {
   const [referenceNumber, setReferenceNumber] = useState("");
@@ -31,7 +30,7 @@ const TicketForm = () => {
     unit: "",
     issueType: "",
     priorityLevel: "",
-    deviceCategory: "",
+    deviceCategory: null,
     serviceTag: "",
     model: "",
     brand: "",
@@ -39,55 +38,45 @@ const TicketForm = () => {
     file: null,
   });
 
-
   // To check if the form is valid (all required fields are filled)
   const isFormValid = () => {
-    return (
-      formData.name &&
-      formData.email &&
-      formData.phone 
-      
-    );
+    return formData.name && formData.email && formData.phone;
   };
 
   const handleChange = (field, value) => {
     setFormData((prevData) => ({
       ...prevData,
       [field]: value,
-      
     }));
   };
 
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData)    
+    console.log(formData);
 
     try {
       const newFormData = new FormData();
-      if(formData.file ){
+      if (formData.file) {
         for (let i = 0; i < formData.file.length; i++) {
-          newFormData.append('file', formData.file[i]);
+          newFormData.append("file", formData.file[i]);
         }
       }
-      
-      newFormData.append('referenceNo', formData.referenceNo);
-      newFormData.append('name', formData.name);
-      newFormData.append('email', formData.email);
-      newFormData.append('phone', formData.phone);
-      newFormData.append('region', formData.region);
-      newFormData.append('unit', formData.unit);
-      newFormData.append('issueType', formData.issueType);
-      newFormData.append('priorityLevel', formData.priorityLevel);
-      newFormData.append('deviceCategory', formData.deviceCategory);
-      newFormData.append('serviceTag', formData.serviceTag);
-      newFormData.append('model', formData.model);
-      newFormData.append('brand', formData.brand);
-      newFormData.append('description', formData.description);
 
+      newFormData.append("referenceNo", formData.referenceNo);
+      newFormData.append("name", formData.name);
+      newFormData.append("email", formData.email);
+      newFormData.append("phone", formData.phone);
+      newFormData.append("region", formData.region);
+      newFormData.append("unit", formData.unit);
+      newFormData.append("issueType", formData.issueType);
+      newFormData.append("priorityLevel", formData.priorityLevel);
+      // newFormData.append("deviceCategory", formData.deviceCategory);
+      newFormData.append("serviceTag", formData.serviceTag);
+      newFormData.append("model", formData.model);
+      newFormData.append("brand", formData.brand);
+      newFormData.append("description", formData.description);
 
-      console.log("new form data",newFormData);
+      console.log("new form data", newFormData);
       const response = await ticketService.create(newFormData);
       toast.success(response.data.message, { position: "top-right" });
     } catch (error) {
@@ -96,18 +85,19 @@ const TicketForm = () => {
         position: "top-right",
       });
     }
-
-
-    
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-4">
-      <div className="mt-5 ml-5" >
+      <form
+        onSubmit={handleSubmit}
+        encType="multipart/form-data"
+        className="space-y-4"
+      >
+        <div className="mt-5 ml-5">
           <Typography
             color="blue-gray"
-            className="underline text-gray-900 md:text-3xl font-display1 font-bold" 
+            className="underline text-gray-900 md:text-3xl font-display1 font-bold"
           >
             Device Trouble Report
           </Typography>

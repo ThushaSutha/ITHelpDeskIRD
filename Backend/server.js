@@ -125,7 +125,8 @@ app.get('/protected', auth.verifyToken, (req, res) => {
 });
 
 
-
+//
+app.use('/uploads', express.static('uploads'));
 
 
 // Register other routes
@@ -137,7 +138,7 @@ require('./routes/unit.routes')(app);
 require('./routes/category.routes')(app);
 require('./routes/device.routes')(app);
 require('./routes/company.routes')(app);
-// require('./routes/image.routes')(app);
+require('./routes/image.routes')(app);
 
 const router = require('./routes/ticket.routes');
 const dbConfig = require("./config/db.config");

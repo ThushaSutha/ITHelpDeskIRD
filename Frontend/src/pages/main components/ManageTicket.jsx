@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import UserService from "../../services/user.service"; // Adjust path based on your project structure
-import LordIconComponent from "../../components/Icons/LordIconComponent"; // Your custom loader
-import LordDeleteIconComponent from "../../components/Icons/LordDeleteIconComponent"; // Your custom loader
+import UserService from "../../services/user.service"; 
+import LordIconComponent from "../../components/Icons/LordIconComponent";
+import LordDeleteIconComponent from "../../components/Icons/LordDeleteIconComponent"; 
 import { Card, CardFooter, Chip, Typography } from "@material-tailwind/react";
 import { Spinner } from "@material-tailwind/react";
-import Avatar from "react-avatar";
 import { format } from "date-fns";
 import { CommentSection } from "react-comments-section";
 import 'react-comments-section/dist/index.css'
+import TicketInfoForm from "../../components/TicketForm/TicketInfoForm";
 
 import {
   MagnifyingGlassIcon,
@@ -34,8 +34,6 @@ import {
 } from "@material-tailwind/react";
 
 import "../../styles/style.css";
-import InputField from "../../components/common/InputField";
-import Select2LikeComponent from "../../components/common/Select2LikeComponent";
 import { Link, useNavigate } from "react-router-dom";
 import TicketService from "../../services/ticket.service";
 
@@ -59,24 +57,21 @@ const Test = () => {
     unit_id: "",
     contact: "",
   });
-  const [selectUnit, setUnitOption] = useState("");
-  const [selectStatus, setStatusOption] = useState("");
-  const units = ["IT", "Accounts", "Network"];
-  const status = ["Active", "Inactive"];
 
-  //function  to handle the unit option
-  const handleUnitChange = (unit) => {
-    const newUnit = typeof unit === "object" ? unit.target.value : unit;
-    setUnitOption(newUnit);
-    console.log("unit", newUnit);
-  };
+  const [formData, setFormData] = useState({
+    id:null,
+    issueType: null,
+    priorityLevel: null,
+    deviceCategory: null,
+    serviceTag: null,
+    model: null,
+    brand: null,
+    description: null,
+    file: null,
+  });
 
-  //function to handle the status option
-  const handleStatusChange = (status) => {
-    const newStatus = typeof status === "object" ? status.target.value : status;
-    setStatusOption(newStatus);
-    console.log("Status", newStatus);
-  };
+
+
 
   const tabs = [
     { label: "All", value: "all" },
@@ -84,11 +79,12 @@ const Test = () => {
     { label: "Unmonitored", value: "unmonitored" },
   ];
 
-  // Fetch user data
+  // Fetch ticket data
   const retrieveTicket = async (page) => {
     setLoading(true);
     try {
       const response = await TicketService.getLogTickets(page,perPage);
+      console.log("ticket data",response.data.data);
       setData(response.data.data || []);
       setFilteredData(response.data.data || []);
       setTotalRows(response.data.totalItems || 0);
@@ -101,10 +97,6 @@ const Test = () => {
     }
   };
 
-  //handle the modal open
-  const handleNewOpen = () => {
-    setNewOpen(!newOpen);
-  };
   const handleOpen = () => {
     setViewOpen(!viewOpen);
   };
@@ -128,11 +120,6 @@ const Test = () => {
     retrieveTicket(1); // Reset to page 1 when page size changes
   };
 
-  // add new user
-  const handleAddUser = async () => {
-    console.log("new user");
-    setNewOpen(!newOpen);
-  };
 
   // Handlers for Action Buttons
   const handleView = (row) => {
@@ -142,9 +129,68 @@ const Test = () => {
   };
 
   const handleUpdate = (row) => {
-    console.log("ussssser id", row.emId);
-    navigate("/update", { state: { userId: row.emId } });
-    console.log("Update clicked for row:", row.emId);
+    setSelectedRow(row);
+    setUpdateOpen(!updateOpen);
+    console.log("Update clicked for row:", row);
+  };
+
+  
+
+  const handleChange = (field, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [field]: value,
+      
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if(formData.model === null){
+      formData.model = selectedRow.model;
+    }
+    if(formData.issueType === null){
+      formData.issueType = selectedRow.category_id
+    }
+    if(formData.priorityLevel === null){
+      formData.priorityLevel = selectedRow.priority
+    }
+    if(formData.serviceTag === null){
+      formData.serviceTag = selectedRow.serial_no
+    }
+    if(formData.brand === null){
+      formData.brand =selectedRow.brand
+    }if(formData.description === null){
+      formData.description = selectedRow.description
+    }
+    if(formData.id === null){
+      formData.id = selectedRow.id
+    }
+    console.log(formData);
+
+    try{
+      const response = await TicketService.update(formData)
+      console.log("Updated response",response);
+
+      setData((prevData) =>
+        prevData.map((ticket) =>
+          ticket.id === selectedRow.id ? { ...ticket, ...formData } : ticket
+        )
+      );
+
+      setFilteredData((prevData) =>
+        prevData.map((ticket) =>
+          ticket.id === selectedRow.id ? { ...ticket, ...formData } : ticket
+        )
+      );
+
+      setUpdateOpen(false);
+    }catch (error) {
+      console.error("Error updating user:", error);
+    } finally {
+      setLoading(false);
+    }
+
   };
 
   //Handle changes in update form fields
@@ -283,18 +329,18 @@ const Test = () => {
       name: "Actions",
       cell: (row) => (
         <div className="flex pr-8">
-          <Tooltip content={"View User"}>
+          <Tooltip content={"View Ticket"}>
             <IconButton variant="text" onClick={() => handleView(row)}>
               <ViewfinderCircleIcon className="h-4 w-4 text-green-700" />
             </IconButton>
           </Tooltip>
-          <Tooltip content={"Edit User"}>
+          <Tooltip content={"Edit Ticket"}>
             <IconButton variant="text" onClick={() => handleUpdate(row)}>
               <PencilSquareIcon className="h-4 w-4 text-blue-700" />
             </IconButton>
           </Tooltip>
 
-          <Tooltip content={"Delete User"}>
+          <Tooltip content={"Delete Ticket"}>
             <IconButton variant="text" onClick={() => handleDelete(row)}>
               <TrashIcon className="h-4 w-4 text-red-700" />
             </IconButton>
@@ -496,6 +542,44 @@ const Test = () => {
               </Button>
             </CardFooter>
           </Card>
+        </DialogBody>
+      </Dialog>
+
+      {/* Update Modal code */}
+
+        <Dialog
+        size="xl"
+        open={updateOpen}
+        handler={updateHandleOpen}
+        className="bg-transparent shadow-none"
+      >
+        <DialogBody className="xs:h-[42rem]  xs:overflow-auto sm:overflow-hidden no-scrollbar ">
+        <form onSubmit={handleSubmit} encType="multipart/form-data">
+          <Card className="mx-auto w-full max-w-lg lg:max-w-2xl">
+            <CardBody className="flex flex-col gap-4">
+              <Typography
+                variant="h4"
+                color="blue-gray"
+                className="flex justify-center text-black text-3xl underline"
+              >
+                Update Ticket 
+              </Typography>
+              
+              <TicketInfoForm isUpdateMode={true} handleChange={handleChange} previousData={selectedRow}/>  
+              
+              
+            </CardBody>
+            
+            <CardFooter className="pt-0 flex flex-row gap-3">
+              <Button type="submit" variant="gradient" onClick={updateHandleOpen} fullWidth>
+                Update
+              </Button>
+              <Button variant="outlined" onClick={updateHandleOpen} fullWidth>
+                Close
+              </Button>
+            </CardFooter>
+          </Card>
+          </form>
         </DialogBody>
       </Dialog>
 
