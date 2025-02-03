@@ -56,24 +56,7 @@ const Test = () => {
     unit_id: "",
     contact: "",
   });
-  const [selectUnit, setUnitOption] = useState("");
-  const [selectStatus, setStatusOption] = useState("");
-  const units = ["IT", "Accounts", "Network"];
-  const status = ["Active", "Inactive"];
 
-  //function  to handle the unit option
-  const handleUnitChange = (unit) => {
-    const newUnit = typeof unit === "object" ? unit.target.value : unit;
-    setUnitOption(newUnit);
-    console.log("unit", newUnit);
-  };
-
-  //function to handle the status option
-  const handleStatusChange = (status) => {
-    const newStatus = typeof status === "object" ? status.target.value : status;
-    setStatusOption(newStatus);
-    console.log("Status", newStatus);
-  };
 
   const tabs = [
     { label: "All", value: "all" },
@@ -86,6 +69,7 @@ const Test = () => {
     setLoading(true);
     try {
       const response = await UserService.getAll(page, perPage);
+      console.log("user data",response);
       setData(response.data.data || []);
       setFilteredData(response.data.data || []);
       setTotalRows(response.data.totalItems || 0);
@@ -99,15 +83,8 @@ const Test = () => {
   };
 
   //handle the modal open
-  const handleNewOpen = () => {
-    setNewOpen(!newOpen);
-  };
   const handleOpen = () => {
     setViewOpen(!viewOpen);
-  };
-
-  const updateHandleOpen = () => {
-    setUpdateOpen(!updateOpen);
   };
 
   const deleteHandleOpen = () => {
@@ -125,12 +102,6 @@ const Test = () => {
     retrieveUser(1); // Reset to page 1 when page size changes
   };
 
-  // add new user
-  const handleAddUser = async () => {
-    console.log("new user");
-    setNewOpen(!newOpen);
-  };
-
   // Handlers for Action Buttons
   const handleView = (row) => {
     setSelectedRow(row);
@@ -142,54 +113,8 @@ const Test = () => {
   const handleUpdate = (row) => {
     console.log("ussssser id", row.emId);
     navigate("/update", { state: { userId: row.emId } });
-    // setSelectedRow(row);
-    // setUpdateUserData({
-    //   id: row.id,
-    //   name: row.name || "",
-    //   email: row.email || "",
-    //   role: row.role || "",
-    //   unit_id: row.unit_id || "",
-    // });
-    // setUpdateOpen(!updateOpen);
-    console.log("Update clicked for row:", row.emId);
   };
 
-  //Handle changes in update form fields
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUpdateUserData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  // update user data
-  const handleUpdateUser = async () => {
-    setLoading(true);
-    try {
-      console.log("id" + updateUserData.name);
-      const response = await UserService.update(updateUserData);
-      console.log("Update response: " + response.data);
-      //update table data with updated user details
-      setData((prevData) =>
-        prevData.map((user) =>
-          user.id === selectedRow.id ? { ...user, ...updateUserData } : user
-        )
-      );
-
-      setFilteredData((prevData) =>
-        prevData.map((user) =>
-          user.id === selectedRow.id ? { ...user, ...updateUserData } : user
-        )
-      );
-
-      setUpdateOpen(false);
-    } catch (error) {
-      console.error("Error updating user:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDelete = (id) => {
     setDeleteOpen(!deleteOpen);

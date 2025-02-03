@@ -1,21 +1,24 @@
 import { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import UserService from "../../services/user.service"; 
 import LordIconComponent from "../../components/Icons/LordIconComponent";
-import LordDeleteIconComponent from "../../components/Icons/LordDeleteIconComponent"; 
-import { Card, CardFooter, Chip, Typography } from "@material-tailwind/react";
-import { Spinner } from "@material-tailwind/react";
+import LordDeleteIconComponent from "../../components/Icons/LordDeleteIconComponent";
 import { format } from "date-fns";
-import { CommentSection } from "react-comments-section";
-import 'react-comments-section/dist/index.css'
+import "react-comments-section/dist/index.css";
 import TicketInfoForm from "../../components/TicketForm/TicketInfoForm";
+import Avatar from "react-avatar";
 
+// Icons import
 import {
   MagnifyingGlassIcon,
   PencilSquareIcon,
   ViewfinderCircleIcon,
   TrashIcon,
   UserPlusIcon,
+  ChevronDownIcon,
+  TicketIcon,
+  ClockIcon ,
+  Bars3BottomLeftIcon,
+  InformationCircleIcon 
 } from "@heroicons/react/24/solid";
 
 import {
@@ -31,18 +34,31 @@ import {
   DialogHeader,
   DialogBody,
   DialogFooter,
+  Collapse,
+  Card, 
+  CardFooter, 
+  Chip, 
+  Typography,
+  Spinner,
+  List,
+  ListItem,
 } from "@material-tailwind/react";
 
 import "../../styles/style.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import TicketService from "../../services/ticket.service";
+import { toast } from "react-toastify";
+import ticketService from "../../services/ticket.service";
+import SelectInput from "./SelectInput";
+import { CommentSection } from "react-comments-section";
+import BgAttachment from "../../assets/attachment-bg.svg"
+import { ActivitiesTimeline } from "./TimeLine";
+import Conversation from "../../assets/conversation.mp4"
 
 const Test = () => {
-  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [filterText, setFilterText] = useState("");
-  const [newOpen, setNewOpen] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -50,16 +66,41 @@ const Test = () => {
   const [totalRows, setTotalRows] = useState(0);
   const [perPage, setPerPage] = useState(10);
   const [selectedRow, setSelectedRow] = useState(null);
-  const [updateUserData, setUpdateUserData] = useState({
-    name: "",
-    email: "",
-    role: "",
-    unit_id: "",
-    contact: "",
-  });
+  const [currentPage, setCurrentPage] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [openKey, setOpenKey] = useState(false);
+  const [openTicketInfo, setOpenTicketInfo] = useState(false);
+  const [statusBtn, setStatusBtn] = useState(false);
+  const [priorityBtn, setPriorityBtn] = useState(false);
+  const [status, setStatus] = useState(null);
+  const [priorityValue, setPriorityValue] = useState("-None-");
+  const priorityOptions = [
+    {name:"-None-",value:3},
+    {name:"Low",value:0},
+    {name:"Medium",value:1},
+    {name:"High",value:2},
+    
+  ];
+  
+  const statusOptions = [
+    {name:"Open",value:0},
+    {name:"Pending",value:1},
+    {name:"Closed",value:2},
+    
+  ];
+  
+
+  const [isConversation,setIsConversation] = useState(true);
+  const [isAttachment,setIsAttachment] = useState(false);
+  const [isHistory,setIsHistory] = useState(false);
+
+  const [prioritySelectedOption, setPrioritySelectedOption] = useState(3);
+  const [statusSelectedOption, setStatusSelectedOption] = useState(0);
+
+  const toggleOpen = () => setOpen((cur) => !cur);
 
   const [formData, setFormData] = useState({
-    id:null,
+    id: null,
     issueType: null,
     priorityLevel: null,
     deviceCategory: null,
@@ -69,9 +110,6 @@ const Test = () => {
     description: null,
     file: null,
   });
-
-
-
 
   const tabs = [
     { label: "All", value: "all" },
@@ -83,11 +121,12 @@ const Test = () => {
   const retrieveTicket = async (page) => {
     setLoading(true);
     try {
-      const response = await TicketService.getLogTickets(page,perPage);
-      console.log("ticket data",response.data.data);
+      const response = await TicketService.getLogTickets(page, perPage);
+      console.log("ticket data", response);
       setData(response.data.data || []);
       setFilteredData(response.data.data || []);
       setTotalRows(response.data.totalItems || 0);
+      setCurrentPage(response.data.currentPage || 0);
     } catch (error) {
       console.error("Error fetching data:", error);
       setData([]);
@@ -120,7 +159,6 @@ const Test = () => {
     retrieveTicket(1); // Reset to page 1 when page size changes
   };
 
-
   // Handlers for Action Buttons
   const handleView = (row) => {
     setSelectedRow(row);
@@ -134,98 +172,64 @@ const Test = () => {
     console.log("Update clicked for row:", row);
   };
 
-  
-
   const handleChange = (field, value) => {
     setFormData((prevData) => ({
       ...prevData,
       [field]: value,
-      
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(formData.model === null){
+    if (formData.model === null) {
       formData.model = selectedRow.model;
     }
-    if(formData.issueType === null){
-      formData.issueType = selectedRow.category_id
+    if (formData.issueType === null) {
+      formData.issueType = selectedRow.category_id;
     }
-    if(formData.priorityLevel === null){
-      formData.priorityLevel = selectedRow.priority
+    if (formData.priorityLevel === null) {
+      formData.priorityLevel = selectedRow.priority;
     }
-    if(formData.serviceTag === null){
-      formData.serviceTag = selectedRow.serial_no
+    if (formData.serviceTag === null) {
+      formData.serviceTag = selectedRow.serial_no;
     }
-    if(formData.brand === null){
-      formData.brand =selectedRow.brand
-    }if(formData.description === null){
-      formData.description = selectedRow.description
+    if (formData.brand === null) {
+      formData.brand = selectedRow.brand;
     }
-    if(formData.id === null){
-      formData.id = selectedRow.id
+    if (formData.description === null) {
+      formData.description = selectedRow.description;
+    }
+    if (formData.id != selectedRow.id) {
+      formData.id = selectedRow.id;
     }
     console.log(formData);
+    console.log("selected row id", formData.id);
 
-    try{
-      const response = await TicketService.update(formData)
-      console.log("Updated response",response);
-
-      setData((prevData) =>
-        prevData.map((ticket) =>
-          ticket.id === selectedRow.id ? { ...ticket, ...formData } : ticket
-        )
-      );
-
-      setFilteredData((prevData) =>
-        prevData.map((ticket) =>
-          ticket.id === selectedRow.id ? { ...ticket, ...formData } : ticket
-        )
-      );
-
-      setUpdateOpen(false);
-    }catch (error) {
-      console.error("Error updating user:", error);
-    } finally {
-      setLoading(false);
-    }
-
-  };
-
-  //Handle changes in update form fields
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUpdateUserData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  // update user data
-  const handleUpdateUser = async () => {
-    setLoading(true);
     try {
-      console.log("id" + updateUserData.name);
-      const response = await UserService.update(updateUserData);
-      console.log("Update response: " + response.data);
-      //update table data with updated user details
+      const response = await TicketService.update(formData);
+      console.log("Updated response", response);
+      toast.success(response.data.message, {
+        position: "top-right",
+      });
+
       setData((prevData) =>
-        prevData.map((user) =>
-          user.id === selectedRow.id ? { ...user, ...updateUserData } : user
+        prevData.map((ticket) =>
+          ticket.id === selectedRow.id ? { ...ticket, ...formData } : ticket
         )
       );
 
       setFilteredData((prevData) =>
-        prevData.map((user) =>
-          user.id === selectedRow.id ? { ...user, ...updateUserData } : user
+        prevData.map((ticket) =>
+          ticket.id === selectedRow.id ? { ...ticket, ...formData } : ticket
         )
       );
 
       setUpdateOpen(false);
+      setSelectedRow(null);
     } catch (error) {
       console.error("Error updating user:", error);
     } finally {
+      setSelectedRow(null);
       setLoading(false);
     }
   };
@@ -238,28 +242,29 @@ const Test = () => {
   const handleConfirmDelete = async () => {
     if (!selectedRow) return;
 
-    setLoading(true);
     try {
       //call the delete API
-      console.log("delete", selectedRow.emId);
-      const response = await UserService.delete(selectedRow.emId);
+      console.log("delete", selectedRow.id);
+      const response = await ticketService.delete(selectedRow.id);
       console.log("Delete response: " + response.data.message);
 
       setData((prevData) =>
-        prevData.filter((user) => user.emId !== selectedRow.emId)
+        prevData.filter((ticket) => ticket.id !== selectedRow.id)
       );
       setFilteredData((prevData) =>
-        prevData.filter((user) => user.emId !== selectedRow.emId)
+        prevData.filter((ticket) => ticket.id !== selectedRow.id)
       );
 
       setDeleteOpen(false);
       setSelectedRow(null);
+      toast.success(response.data.message, {
+        position: "top-right",
+      });
     } catch (error) {
-      console.error("Error deleting user: ", error);
+      console.error("Error deleting Ticket: ", error);
     } finally {
       setLoading(false);
     }
-    console.log("Delete clicked for row ID:", selectedRow);
   };
 
   //filter rows based on filter text
@@ -273,14 +278,17 @@ const Test = () => {
 
   useEffect(() => {
     retrieveTicket(1);
-    console.log("Role", localStorage.getItem('userRole'));
+    console.log("Role", localStorage.getItem("userRole"));
   }, [perPage]);
 
   // Define columns
   const columns = [
     {
       name: "#",
-      cell: (row, index) => <span>{index + 1}</span>,
+      cell: (row, index) => {
+        const displayIndex = index + 1 + perPage * (currentPage - 1); // Adjust index based on pagination
+        return <span>{displayIndex}</span>;
+      },
     },
     {
       name: "Title",
@@ -350,19 +358,6 @@ const Test = () => {
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
-    },
-  ];
-
-  const comData = [
-    {
-      userId: "02b",
-      comId: "017",
-      fullName: "Lily",
-      userProfile: "https://www.linkedin.com/in/riya-negi-8879631a9/",
-      text: "I think you have a point🤔",
-      avatarUrl: "https://ui-avatars.com/api/name=Lily&background=random",
-      timestamp: "2024-10-28T12:34:56Z",
-      replies: [],
     },
   ];
 
@@ -440,145 +435,409 @@ const Test = () => {
       {/* View Modal code */}
 
       <Dialog
-        size="md"
+        size="xxl"
         open={viewOpen}
         handler={handleOpen}
-        className="bg-transparent shadow-none"
       >
-        <DialogBody className="xs:h-[42rem]  xs:overflow-auto sm:overflow-hidden no-scrollbar ">
-          <Card className="mx-auto w-full max-w-lg lg:max-w-2xl">
-            <CardBody className="flex flex-col gap-4">
-              <Typography
-                variant="h4"
-                color="blue-gray"
-                className="flex justify-center text-black text-3xl underline"
-              >
-                Ticket Details
-              </Typography>
-              <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-4">
-                {/* Left Section: Avatar */}
+        <DialogBody className=" p-0 xs:overflow-auto bg-[f6f8fb] sm:overflow-hidden no-scrollbar sm:grid-cols-1 grid-cols-1 grid lg:grid-cols-12  gap-1  text-black">
+        <div className="flex bg-transparent   border-2 border-gray-200  flex-col items-center max-w-screen-2xl w-full  justify-start  md:max-h-screen md:overflow-y-auto  md:col-span-3 col-span-9  ">
 
-                {/* Right Section: Details */}
-                <div className="col-span-2">
-                  <div className="ml-5">
-                    {/* Personal Details */}
-                    {/* <div className="flex justify-center">Personal</div>
-                    <hr className="border-t-2 border-gray-300 mb-4" /> */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <div>
-                        <Typography className="font-black font-serif text-2xl text-black">Reference No: 
-                        {selectedRow?.priority}
-                        </Typography>
-                        
-                      </div>
-                      <div>
-                        <Typography className="font-black font-serif text-2xl  text-black">Issue Type: 
-                        {selectedRow?.user_id}
-                        </Typography>
-                        
-                      </div>
-                      <div>
-                        <Typography className="font-black font-serif text-2xl  text-black">User Email
-                          {selectedRow?.status_id}
-                        </Typography>
-                        
-                      </div>
-                      <div>
-                        <Typography className="font-black font-serif text-2xl  text-black">Contact No: 
-                          {selectedRow?.status_id}
-                        </Typography>
-                      </div>
-                      <div>
-                        <Typography className="font-black font-serif text-2xl  text-black">Ticket status: 
-                          {selectedRow?.status_id}
-                        </Typography>
-                      </div>
-                      <div>
-                        <Typography className="font-black font-serif text-2xl  text-black">Priority: 
-                          {selectedRow?.status_id}
-                        </Typography>
-                      </div>
-                      
-                        
-                      
-                    </div>
-                    <div className="flex  mt-5">
-                      <Typography className="font-black font-serif text-2xl  text-black">Description: 
-                          {selectedRow?.status_id}
-                        </Typography>
-                    </div>
-                  </div>
+            <div className="bg-gray-50 w-full p-5 pl-10 sticky top-0 z-10 justify-between border-b-2 border-blue-gray-50 flex ">
+              <div>Ticket Properties</div>
+              <div><InformationCircleIcon class="h-6 w-6 text-gray-500" /></div>
+              </div>
+            {/* Contact info */}
+            
+
+            
+            <div className="bg-gray-50 w-11/12  mt-2 rounded-md  ">
+              <div
+                onClick={toggleOpen}
+                className="m-1 my-2 p-2 mx-3 hover:bg-blue-gray-50 flex flex-row justify-between rounded-md "
+              >
+                <div>Contact Info</div>
+                <div>
+                  <ChevronDownIcon
+                    width={25}
+                    className={`transition-transform duration-300 ${
+                      open ? "rotate-180" : ""
+                    }`}
+                  />
                 </div>
               </div>
-            </CardBody>
-            <CommentSection
-              currentUser={{
-                currentUserId: selectedRow?.user_id,
-                currentUserImg:
-                  "https://ui-avatars.com/api/name=Riya&background=random",
-                currentUserProfile:
-                  "https://www.linkedin.com/in/riya-negi-8879631a9/",
-                currentUserFullName: selectedRow?.title,
-              }}
-              logIn={{
-                onLogin: function () {
-                  alert("Call login function ");
-                },
-                signUpLink: "http://localhost:3000/",
-              }}
-              // commentData={comData}
-              placeholder="Write your comment..."
-              onSubmitAction={function (data) {
-                console.log("check submit, ", data);
-              }}
-              currentData={function (data) {
-                console.log("current data", data);
-              }}
-            />
-            ;
-            <CardFooter className="pt-0">
-              <Button variant="gradient" onClick={handleOpen} fullWidth>
-                Close
-              </Button>
-            </CardFooter>
-          </Card>
+              <Collapse open={open}>
+                <div className="pl-5">
+                  <Typography
+                  variant="h6"
+                  className=" hover:text-blue-800 hover:cursor-pointer w-fit"
+                  >Reyanson Sosai</Typography>
+                  <Typography
+                  variant="small"
+                  className="text-gray-600 font-serif hover:underline hover:decoration-dotted w-fit hover:cursor-pointer"
+                  > <Tooltip content={"View Ticket"}> Reyanson@gmail.com</Tooltip>
+                  </Typography>
+                  <Typography
+                  variant="small"
+                  className="text-gray-600 font-serif hover:underline hover:decoration-dotted w-fit hover:cursor-pointer"
+                  > <Tooltip content={"View Ticket"}> 0763787940</Tooltip>
+                  </Typography>
+                  
+          
+                </div>
+              </Collapse>
+            </div>
+            
+  
+            {/* Key info */}
+            <div className="bg-gray-50 w-11/12 mt-2 rounded-md">
+              <div
+                onClick={()=> setOpenKey(!openKey)}
+                className="m-1 my-2 p-2 mx-3 hover:bg-blue-gray-50 flex flex-row justify-between rounded-md "
+              >
+                <div>Key Information</div>
+                <div>
+                  <ChevronDownIcon
+                    width={25}
+                    className={`transition-transform duration-300 ${
+                      openKey ? "rotate-180" : ""
+                    }`}
+                  />
+                </div>
+              </div>
+              <Collapse open={openKey}>
+                <div className="pl-5">
+                  {/* Ticket Owner */}
+                  <Typography
+                  variant="paragraph"
+                  className="font-serif  w-fit text-gray-600">
+                    Ticket Owner
+                  </Typography>
+                  <div className="flex flex-col-2 gap-2 items-center">
+                    <div><Avatar name="Reyanson Sosai" size="40" round={true} color="#FFF" fgColor="000" className="border" /></div>
+                    <div>Reyanson Sosai</div>
+                  </div>
+
+                  {/* Status */}
+                  <Typography
+                  variant="paragraph"
+                  className="font-serif mt-5  w-fit text-gray-600">
+                    Status
+                  </Typography>
+                  <div className="w-11/12">
+                      <Button
+                      size="sm"
+                      fullWidth
+                      className="flex mb-5 items-center justify-evenly w-4/12"
+                      onClick={()=>setStatusBtn(!statusBtn)}
+                      >
+                        <div>
+                        {
+                          statusOptions
+                            .filter((status) => status.value === statusSelectedOption)
+                            .map((filteredStatus) => (
+                              <span key={filteredStatus.value}>{filteredStatus.name}</span>
+                            ))
+                        }
+                        </div>
+
+                        <div><ChevronDownIcon className=" w-5 text-white" /></div>
+                        </Button>
+
+                        {
+                        statusBtn === true ?(
+                          <>
+                            <SelectInput 
+                            liIcon={true} 
+                            isTitle={true}
+                            title="STATUS"
+                            list={statusOptions}
+                            selected={statusSelectedOption}
+                            onSelect={(value) => setStatusSelectedOption(value)}
+                            
+                            />
+                          </>
+                        ):""
+
+                      }
+                      
+                        
+                  </div>
+          
+                </div>
+              </Collapse>
+            </div>
+
+            {/* Ticket info */}
+            <div className="bg-gray-50 w-11/12 my-2 rounded-md">
+              <div
+                onClick={()=>setOpenTicketInfo(!openTicketInfo)}
+                className="m-1 my-2 p-2 mx-3 hover:bg-blue-gray-50 flex flex-row justify-between rounded-md "
+              >
+                <div>Ticket Info</div>
+                <div>
+                  <ChevronDownIcon
+                    width={25}
+                    className={`transition-transform duration-300 ${
+                      openTicketInfo ? "rotate-180" : ""
+                    }`}
+                  />
+                </div>
+              </div>
+              <Collapse open={openTicketInfo}>
+              <div className="pl-5 pb-5">
+                  
+                  {/* Status */}
+                  <Typography
+                  variant="paragraph"
+                  className="font-serif  w-fit text-gray-600">
+                    Priority
+                  </Typography>
+                  <div className="w-11/12">
+                  
+                  
+                        
+
+                        <Input variant="static" placeholder="Search status" 
+                        value={priorityValue}
+                        onClick={()=>setPriorityBtn(!priorityBtn)}
+                        />
+                        {
+                        priorityBtn === true ?(
+                          <>
+                          
+                          <SelectInput 
+                              liIcon={false} 
+                              list={priorityOptions}
+                              selected={prioritySelectedOption}
+                              onSelect={(value) => setPrioritySelectedOption(value)}
+
+                            
+                            />
+                          
+                          </>
+                        ):""
+
+                      }
+
+                    
+                      
+                        
+                  </div>
+          
+                </div>
+              </Collapse>
+            </div>
+            
+          </div>
+
+
+        {/* Big Left side  */}
+          <div className="col-span-9 bg-white w-full grid grid-cols-1 grid-rows-6 rounded-md border-l-2 border-t-2 border-r-2 border-b-2 border-grey-200">
+
+            <div className="mt-5 mb-5 row-span-1">
+                      <div className="ml-32 flex gap-2 mb-2"><TicketIcon class="h-6 w-6 text-black" />Ticket Name</div>
+                      <div className="ml-32 flex gap-5 items-center">
+                        <span className="border-2 px-3 py-0 my-0 shadow-sm border-gray-200  font-display1 rounded-md  w-fit h-fit hover:cursor-default hover:border-black">#102</span>
+                        <span>Ticket riser name</span>
+                        <span className="flex items-center"><ClockIcon class="h-3 w-3 text-gray-500 bg-transparent" /><Bars3BottomLeftIcon class="h-3 w-3 text-gray-500 mr-1" />
+                        date and time </span>
+
+                      </div>
+            </div>
+            <div className=" border-1 border-b self-center ">
+                
+                    
+                <List className="flex-row gap-5 justify-evenly items-baseline  ">
+      
+                    <Typography
+                        as="a"
+                        href="#"
+                        variant="small"
+                        color="blue-gray"
+                        className="font-medium"
+                    >
+                        <ListItem className="flex items-center" 
+                        onClick={()=> {setIsConversation(true),setIsAttachment(false),setIsHistory(false)}}
+                        >Conversation</ListItem>
+                    </Typography>
+                    
+
+                    <Typography
+                        as="a"
+                        href="#"
+                        variant="small"
+                        color="blue-gray"
+                        className="font-medium"
+                    >
+                        <ListItem className="flex items-center"
+                        onClick={()=> {setIsConversation(false), setIsAttachment(true),setIsHistory(false)}}
+                        >
+                        Attachment
+                        </ListItem>
+                    </Typography>
+                    <Typography
+                        as="a"
+                        href="#"
+                        variant="small"
+                        color="blue-gray"
+                        className="font-medium"
+                    >
+                        <ListItem className="flex items-center"
+                        onClick={() => {setIsConversation(false), setIsAttachment(false),setIsHistory(true)}}
+                        >
+                        History
+                        </ListItem>
+                    </Typography>
+                    </List>
+                
+        
+            </div>
+
+            <div className="row-span-4">
+                {
+                    isConversation && (
+                        <>
+                        <div className="h-96 overflow-y-auto  rounded-md ">
+                        <CommentSection
+                            currentUser={{
+                            currentUserId: 112,
+                            currentUserImg:
+                                "https://ui-avatars.com/api/name=Riya&background=random",
+                            currentUserProfile:
+                                "https://www.linkedin.com/in/riya-negi-8879631a9/",
+                            currentUserFullName: "Reyanson Sosai",
+                            }}
+                            logIn={{
+                            onLogin: function () {
+                                alert("Call login function ");
+                            },
+                            signUpLink: "http://localhost:3000/",
+                            }}
+                            // commentData={comData}
+                            placeholder="Write your comment..."
+                            onSubmitAction={function (data) {
+                            console.log("check submit, ", data);
+                            }}
+                            currentData={function (data) {
+                            console.log("current data", data);
+                            }}
+                            onDeleteAction={() => window.prompt('Are you sure?')}
+                            onReplyAction={() => alert('Reply was posted')}
+                            onEditAction={() => alert('Reply was edited!')}
+                            customNoComment={() => 
+                              <div className='no-com flex flex-col items-center justify-center bg-transparent'>
+                                <video
+                                  autoPlay
+                                  loop
+                                  muted
+                                  playsInline
+                                  className=" w-40  object-cover"
+                                >
+                                  <source src={Conversation} type="video/mp4" />
+                                  Your browser does not support the video tag.
+                                </video>
+
+                                <div className="font-serif text-2xl text-blue-gray-100">Start New Conversation</div>
+                              </div>
+                            }
+                        />
+                        </div>
+                        
+                        </>
+                    )
+
+                }
+
+                {
+                    isAttachment && (
+                        <>
+                        <div className="justify-center flex-col mt-16 w-full justify-items-center">
+                            <img src={BgAttachment} alt="" className="w-52 bg-transparent attachment-class rounded-md" />
+                            <div>
+                                <p className="font-serif text-2xl text-blue-gray-100 ">No Attachments available</p>
+                            
+                            </div>
+                        </div>
+                        
+                        </>
+                    )
+                }
+
+                {
+                    isHistory &&(
+                        <>
+                        <div className="ml-32">
+                            <ActivitiesTimeline />
+                            </div>
+                        </>
+                    )
+                }
+               
+            </div>
+
+          </div>
         </DialogBody>
-      </Dialog>
+
+        <DialogFooter>
+          <Button
+            variant="text"
+            color="red"
+            onClick={() => handleOpen(null)}
+            className="mr-1"
+          >
+            <span>Cancel</span>
+          </Button>
+          <Button
+            variant="gradient"
+            color="green"
+            onClick={() => handleOpen(null)}
+          >
+            <span>Confirm</span>
+          </Button>
+        </DialogFooter>
+        </Dialog>
 
       {/* Update Modal code */}
 
-        <Dialog
+      <Dialog
         size="xl"
         open={updateOpen}
         handler={updateHandleOpen}
         className="bg-transparent shadow-none"
       >
         <DialogBody className="xs:h-[42rem]  xs:overflow-auto sm:overflow-hidden no-scrollbar ">
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
-          <Card className="mx-auto w-full max-w-lg lg:max-w-2xl">
-            <CardBody className="flex flex-col gap-4">
-              <Typography
-                variant="h4"
-                color="blue-gray"
-                className="flex justify-center text-black text-3xl underline"
-              >
-                Update Ticket 
-              </Typography>
-              
-              <TicketInfoForm isUpdateMode={true} handleChange={handleChange} previousData={selectedRow}/>  
-              
-              
-            </CardBody>
-            
-            <CardFooter className="pt-0 flex flex-row gap-3">
-              <Button type="submit" variant="gradient" onClick={updateHandleOpen} fullWidth>
-                Update
-              </Button>
-              <Button variant="outlined" onClick={updateHandleOpen} fullWidth>
-                Close
-              </Button>
-            </CardFooter>
-          </Card>
+          <form onSubmit={handleSubmit} encType="multipart/form-data">
+            <Card className="mx-auto w-full max-w-lg lg:max-w-2xl">
+              <CardBody className="flex flex-col gap-4">
+                <Typography
+                  variant="h4"
+                  color="blue-gray"
+                  className="flex justify-center text-black text-3xl underline"
+                >
+                  Update Ticket
+                </Typography>
+
+                <TicketInfoForm
+                  isUpdateMode={true}
+                  handleChange={handleChange}
+                  previousData={selectedRow}
+                />
+              </CardBody>
+
+              <CardFooter className="pt-0 flex flex-row gap-3">
+                <Button
+                  type="submit"
+                  variant="gradient"
+                  onClick={updateHandleOpen}
+                  fullWidth
+                >
+                  Update
+                </Button>
+                <Button variant="outlined" onClick={updateHandleOpen} fullWidth>
+                  Close
+                </Button>
+              </CardFooter>
+            </Card>
           </form>
         </DialogBody>
       </Dialog>
@@ -614,7 +873,7 @@ const Test = () => {
 
             <div className="flex justify-center">
               <Typography className="mb-10 mt-7 " color="gray" variant="lead">
-                Do you want to delete this user?
+                Do you want to delete this Ticket?
               </Typography>
             </div>
           </div>

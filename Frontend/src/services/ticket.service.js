@@ -2,8 +2,8 @@ import http from "../api/auth"
 
 class TicketService{
 
-    getAll(){
-        return http.get('api/tickets');
+    getAll(page){
+        return http.get(`api/tickets?page=${page}&size=10`);
     }
 
     get(id){

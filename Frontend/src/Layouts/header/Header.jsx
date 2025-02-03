@@ -60,6 +60,7 @@ const Header = () => {
         <>
           {/* <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">Assign Priority</Link>
           <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">view pending repair requests</Link> */}
+          <Link to="/tickets" className="text-gray-300 hover:text-white transition duration-300">Ticket Management</Link>
           <Link to="/ticket-report" className="text-gray-300 hover:text-white transition duration-300">Ticket Reports</Link>
         </>
       ): role === "account_staff" ? (

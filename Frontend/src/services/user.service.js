@@ -1,7 +1,6 @@
 import http from "../api/auth";
 
 class UserService{
-
     getAll(page) {
         const id = localStorage.getItem("Auth");
         return http.get(`/api/users?page=${page}&size=10`,{

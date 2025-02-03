@@ -149,3 +149,38 @@ body {
 .send-button:hover {
   background-color: #0056b3;
 }
+
+
+
+
+/* comment section css */
+div .replyIcon{
+  position: relative;
+}
+
+div .szh-menu {
+  font-family: sans-serif;
+  font-size: 0.925rem;
+  position: fixed !important;
+  box-shadow: 1px 1px 20px 1px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  padding: 6px !important;
+  min-width: 7rem;
+  left: 90% !important;
+  top: 50% !important;
+  color: black;
+
+.szh-menu__item {
+  padding: 5px;
+}
+
+
+  
+div  .szh-menu__item:hover {
+    color: black;
+    background-color: #f5f5f5;
+  }
+}
+
+
+

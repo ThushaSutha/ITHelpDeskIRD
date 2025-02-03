@@ -18,7 +18,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoute from "./contexts/ProtectedRoute";
 import PublicRoute from "./route/public route/PublicRoute";
 import Unauthorized from "./pages/main components/UnauthorizedPage";
-import Test from "./components/Test";
+// import Test from "./components/Test";
 import NewTicket from "./pages/main components/NewTicket";
 
 import AboutUs from "./pages/main components/AboutUs";
@@ -31,6 +31,8 @@ import AddDeviceDetails from "./pages/supplystaff/adddevice";
 import ReportGenerator from "./pages/it-in-charge/ReportGenerator";
 import Managedevice from "./pages/supplystaff/managedevice";
 import KpiCard from "./pages/it-in-charge/KpiCard"
+import Test from "./pages/main components/Test"
+
 
 
 function App() {
@@ -52,6 +54,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/test" element={<KpiCard />} />
+            <Route path="/dial" element={<Test />} />
 
 
             {/* IT in-charge - 1.Assign Priority 2.Oversee all Tickets 3.Monitor system performance 4. view pending repair requests 5.Generate reports */}
@@ -76,7 +79,7 @@ function App() {
             <Route
               path="/tickets"
               element={
-                <ProtectedRoute roles={["staff", "admin"]}>
+                <ProtectedRoute roles={["staff", "admin","it_in_charge"]}>
                   <ManageTicket />
                 </ProtectedRoute>
               }

@@ -92,68 +92,83 @@ exports.create = [this.upload.array('file',10),async (req, res) => {
 
 
 //Retrieve all tickets from the database.
-exports.findAll = (req, res) => {
-    const title = req.query.title;
-    var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
-
-    Ticket.findAll({
-        where: condition,
-        include: [
-            {
-                model: User,
-                attributes: ['name']
-            },
-            {
-                model: User,
-                attributes: ['name'],
-                as:'assigned'
-            },
-            {
-                model: Category,
-                attributes: ['name'],
-                as : 'category'
-            },
-            {
-                model: Device,
-                attributes: ['brand','model','device_type'],
-                as : 'device'
-            },
-            {
-                model: Ticket_Image,
-                attributes:['path','id'],
-                as : 'ticket_images'
-            }
-        ]
-    })
-        .then(data => {
-            res.status(200).send({
-                message: "All tickets retrieved successfully",
-                data: data.map(ticket => ({
-                    id: ticket.id,
-                    description: ticket.description,
-                    status: ticket.status,
-                    user_id: ticket.user_id,
-                    assigned_to:ticket.assigned_to ? ticket.assigned.name:'null' ,
-                    user_name: ticket.user ? ticket.user.name : 'No associated user',
-                    priority: ticket.priority,
-                    category_id: ticket.category_id,
-                    category: ticket.category? ticket.category.name:'null',
-                    device: ticket.device? ticket.device.device_type:'null',
-                    serial_no: ticket.serial_no,
-                    model: ticket.device? ticket.device.model:'null',
-                    brand: ticket.device? ticket.device.brand:'null',
-                    file: ticket.ticket_images? ticket.ticket_images:'null',
-                    createdAt: ticket.createdAt,
-                    updatedAt: ticket.updatedAt
-                }))
-            });
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving tickets."
-            });
+exports.findAll = async (req, res) => {
+    const { page = 1, size = 5 } = req.query;
+    const pageNum = Math.max(1, Number(page) || 1);
+    const limit = Math.max(1, Number(size) || 5);
+    const offset = (pageNum - 1) * limit;
+    
+    try {
+        const result = await Ticket.findAndCountAll({
+            limit: limit,
+            offset: offset,
+            include: [
+                {
+                    model: User,
+                    attributes: ['name']
+                },
+                {
+                    model: User,
+                    attributes: ['name'],
+                    as: 'assigned'
+                },
+                {
+                    model: Category,
+                    attributes: ['name'],
+                    as: 'category'
+                },
+                {
+                    model: Device,
+                    attributes: ['brand', 'model', 'device_type'],
+                    as: 'device'
+                },
+                {
+                    model: Ticket_Image,
+                    attributes: ['path', 'id'],
+                    as: 'ticket_images'
+                }
+            ]
         });
+
+        const totalItems = await Ticket.count({
+            where: {
+                deletedAt: null // Ensure soft-deleted tickets are excluded
+            }
+        });
+
+        res.status(200).send({
+            message: "All tickets retrieved successfully",
+            data: result.rows.map(ticket => ({
+                id: ticket.id,
+                description: ticket.description,
+                status: ticket.status,
+                user_id: ticket.user_id,
+                assigned_to: ticket.assigned ? ticket.assigned.name : 'null',
+                user_name: ticket.user ? ticket.user.name : 'No associated user',
+                priority: ticket.priority,
+                category_id: ticket.category_id,
+                category: ticket.category ? ticket.category.name : 'null',
+                device: ticket.device ? ticket.device.device_type : 'null',
+                serial_no: ticket.serial_no,
+                model: ticket.device ? ticket.device.model : 'null',
+                brand: ticket.device ? ticket.device.brand : 'null',
+                file: ticket.ticket_images.length ? ticket.ticket_images : [],
+                createdAt: ticket.createdAt,
+                updatedAt: ticket.updatedAt
+            })),
+            totalItems: totalItems,  // Awaited total count value
+            totalPages: Math.ceil(totalItems / limit),
+            currentPage: +page
+        });
+    } catch (err) {
+        res.status(500).send({
+            message: err.message || "Some error occurred while retrieving tickets."
+        });
+    }
 };
+
+
+
 
 
 
