@@ -97,9 +97,37 @@ isModeratorOrAdmin = (req, res, next) => {
   });
 };
 
+
+//it-in charge and admin
+
+isItInChargeOrAdmin = (req, res, next) => {
+  User.findByPk(req.userId).then(user => {
+    console.log("IT IN CHARGE");
+    if (!user) {
+      return res.status(404).send({
+        message: "User Not found."
+      });
+    }
+
+    if (user.role === "it_in_charge") {
+      next();
+      return;
+    }
+
+    res.status(403).send({
+      message: "Require it_in_charge Role!"
+    });
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message
+    });
+  });
+};
+
 module.exports = {
   verifyToken,
   isAdmin,
   isModerator,
-  isModeratorOrAdmin
+  isModeratorOrAdmin,
+  isItInChargeOrAdmin
 };

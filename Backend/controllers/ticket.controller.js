@@ -89,6 +89,26 @@ exports.create = [this.upload.array('file',10),async (req, res) => {
     
 }];
 
+//Retrieve all tickets from the database. with out pagination
+exports.findAllWithoutPagination = (req, res) => {
+    const title = req.query.title;
+    var condition = title ? { title: { [Op.like]: `%${title}%` }} : null;
+
+    Ticket.findAll({ where: condition})
+    .then(data => {
+        res.status(200).send({
+            message: "All units retrieved successfully",
+            data: data
+        });
+    })
+    .catch(err => {
+        res.status(500).send({
+            message: err.message || "Some error occurred while retrieving tutorials."
+        });
+    });
+
+
+};
 
 
 //Retrieve all tickets from the database.
@@ -156,7 +176,7 @@ exports.findAll = async (req, res) => {
                 createdAt: ticket.createdAt,
                 updatedAt: ticket.updatedAt
             })),
-            totalItems: totalItems,  // Awaited total count value
+            totalItems: totalItems,  
             totalPages: Math.ceil(totalItems / limit),
             currentPage: +page
         });

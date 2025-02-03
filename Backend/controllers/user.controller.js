@@ -66,6 +66,31 @@ exports.getUsers = async (req,res) => {
     
 };
 
+
+//retrive users list depend on role
+exports.findByRole = (req, res) => {
+    const role = req.query.role;
+    console.log("The ROLE IS",role);
+
+    var condition = role ? { role: { [Op.like]: `%${role}%` }} : null;
+
+    console.log("Find by role condition ",condition);
+
+    User.findAll({ where: condition})
+    .then(data => {
+        res.status(200).send({
+            message: "All units retrieved successfully",
+            data: data
+        });
+    })
+    .catch(err => {
+        res.status(500).send({
+            message: err.message || "Some error occurred while retrieving tutorials."
+        });
+    });
+
+};
+
 //find a user by id
 exports.findOne = async (req,res) => {
     const id = req.params.id;

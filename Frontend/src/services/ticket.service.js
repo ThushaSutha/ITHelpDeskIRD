@@ -2,8 +2,12 @@ import http from "../api/auth"
 
 class TicketService{
 
-    getAll(page){
-        return http.get(`api/tickets?page=${page}&size=10`);
+    getAll(page,size){
+        return http.get(`api/tickets?page=${page}&size=${size}`);
+    }
+
+    getAllWithoutPagination(){
+        return http.get('api/tickets/all');
     }
 
     get(id){

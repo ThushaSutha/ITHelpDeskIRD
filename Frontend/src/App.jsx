@@ -32,10 +32,12 @@ import ReportGenerator from "./pages/it-in-charge/ReportGenerator";
 import Managedevice from "./pages/supplystaff/managedevice";
 import KpiCard from "./pages/it-in-charge/KpiCard"
 import Test from "./pages/main components/Test"
+import TicketAssignment from "./pages/it-in-charge/TicketAssignment";
 
 
 
 function App() {
+  const role = localStorage.getItem("userRole");
   return (
     <>
       {/* Toast Container for Global Notifications */}
@@ -55,6 +57,7 @@ function App() {
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/test" element={<KpiCard />} />
             <Route path="/dial" element={<Test />} />
+            <Route path="/TicketAssignment" element={<TicketAssignment />} />
 
 
             {/* IT in-charge - 1.Assign Priority 2.Oversee all Tickets 3.Monitor system performance 4. view pending repair requests 5.Generate reports */}
@@ -63,6 +66,14 @@ function App() {
               element={
                 <ProtectedRoute roles={["it_in_charge", "admin"]}>
                   <ReportGenerator />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ticket-assign"
+              element={
+                <ProtectedRoute roles={["it_in_charge", "admin"]}>
+                  <TicketAssignment />
                 </ProtectedRoute>
               }
             />
@@ -80,7 +91,19 @@ function App() {
               path="/tickets"
               element={
                 <ProtectedRoute roles={["staff", "admin","it_in_charge"]}>
-                  <ManageTicket />
+                  {role==="it_in_charge" ? 
+                  (
+                  <>
+                   <ManageTicket role={role} />
+                  </>
+                  ):(
+                    <>
+                      <ManageTicket />
+                    </>
+                  )
+                }
+                  
+                  
                 </ProtectedRoute>
               }
             />
@@ -119,7 +142,7 @@ function App() {
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute roles={["staff", "admin"]}>
+                <ProtectedRoute roles={["staff", "admin","it_in_charge"]}>
                   <Dashboard />
                 </ProtectedRoute>
               }

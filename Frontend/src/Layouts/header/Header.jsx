@@ -58,9 +58,22 @@ const Header = () => {
         </>
       ): role === "it_in_charge" ? (
         <>
-          {/* <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">Assign Priority</Link>
-          <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">view pending repair requests</Link> */}
-          <Link to="/tickets" className="text-gray-300 hover:text-white transition duration-300">Ticket Management</Link>
+          <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">Dashboard</Link>
+         {/*  <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-300">view pending repair requests</Link> */}
+         
+         <nav>
+      <div className="group relative z-10">
+        <Link to="/tickets" className="text-gray-300 hover:text-white transition duration-300">
+          Ticket Management
+        </Link>
+        <ul className="hidden group-hover:block absolute bg-gray-800 text-white mt-1 p-2 rounded shadow-lg">
+          <li className="p-1 hover:bg-gray-700 rounded"> <Link to="/ticket-assign" className="text-gray-300 hover:text-while transition duration-300"> Assignment Tickets</Link> </li>
+          
+        </ul>
+      </div>
+
+      
+    </nav>
           <Link to="/ticket-report" className="text-gray-300 hover:text-white transition duration-300">Ticket Reports</Link>
         </>
       ): role === "account_staff" ? (

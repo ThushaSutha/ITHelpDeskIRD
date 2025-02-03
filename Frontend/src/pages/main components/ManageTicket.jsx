@@ -55,7 +55,7 @@ import BgAttachment from "../../assets/attachment-bg.svg"
 import { ActivitiesTimeline } from "./TimeLine";
 import Conversation from "../../assets/conversation.mp4"
 
-const Test = () => {
+const Test = ({role}) => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [filterText, setFilterText] = useState("");
@@ -374,7 +374,10 @@ const Test = () => {
                 Tickets Management
               </Typography>
             </div>
-            <div className="basis-2/12 ">
+
+            {
+              role != "it_in_charge" &&(
+                <div className="basis-2/12 ">
               <Link to="/new-ticket">
                 <Button className="flex  items-center " size="sm">
                   <UserPlusIcon className="h-6 w-6 text-white" />
@@ -382,6 +385,9 @@ const Test = () => {
                 </Button>
               </Link>
             </div>
+              )
+            }
+            
           </div>
 
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">

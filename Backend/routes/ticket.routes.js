@@ -11,6 +11,9 @@
     //get all tickets
     router.get('/',ticket.findAll);
 
+    //get all tickets with out pagination
+    router.get('/all',ticket.findAllWithoutPagination);
+
     //get a ticket by id
     router.get('/:id',ticket.findOne);
 

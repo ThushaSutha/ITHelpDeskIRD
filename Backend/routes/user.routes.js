@@ -54,6 +54,9 @@ module.exports = app => {
 
     //get a user by id
     router.get("/:id", [authJwt.verifyToken,authJwt.isAdmin] ,user.findOne);
+    
+    //get a user by role
+    router.get("/role/all", [authJwt.verifyToken,authJwt.isItInChargeOrAdmin] ,user.findByRole);
 
     //update a ticket with id
     router.put("/:id", [authJwt.verifyToken,authJwt.isAdmin] ,user.update);

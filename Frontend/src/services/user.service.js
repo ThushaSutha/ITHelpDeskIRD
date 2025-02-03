@@ -15,6 +15,15 @@ class UserService{
         return http.get(`/api/users/${id}`);
     }
 
+    getByRole(role) {
+        console.log("The service role", role);
+        return http.get(`/api/users/role/all`, {
+            params: { // Proper way to send GET parameters
+                role: role
+            }
+        });
+    }
+
     create(data){
         return http.post('/api/auth/signup', data);
     }
