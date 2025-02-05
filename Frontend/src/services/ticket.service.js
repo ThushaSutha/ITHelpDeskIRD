@@ -6,6 +6,10 @@ class TicketService{
         return http.get(`api/tickets?page=${page}&size=${size}`);
     }
 
+    getUnassignedAll(page,size){
+        return http.get(`api/tickets/unassigned/all?page=${page}&size=${size}`);
+    }
+
     getAllWithoutPagination(){
         return http.get('api/tickets/all');
     }
@@ -36,6 +40,10 @@ class TicketService{
 
     update(data){
         return http.put(`/api/tickets/${data.id}`, data);
+    }
+
+    assignTicket(data){
+        return http.put(`/api/tickets/assign/${data.id}`, data);
     }
 
     delete(id){

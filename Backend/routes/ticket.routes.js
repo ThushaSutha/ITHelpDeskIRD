@@ -10,6 +10,9 @@
 
     //get all tickets
     router.get('/',ticket.findAll);
+    
+    //get all unassigned tickets
+    router.get('/unassigned/all',ticket.findAllUnassigned);
 
     //get all tickets with out pagination
     router.get('/all',ticket.findAllWithoutPagination);
@@ -22,6 +25,9 @@
 
     //update a ticket with id
     router.put('/:id',ticket.update);
+
+    //Assigned a ticket with id
+    router.put('/assign/:id',ticket.assignTicket);
 
     //soft delete a ticket with id
     router.delete('/:id',ticket.delete);

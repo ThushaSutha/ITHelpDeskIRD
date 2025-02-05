@@ -30,7 +30,7 @@ export default function TicketAssignment() {
   const retrieveTicket = async (page) => {
     setLoading(true);
     try {
-      const response = await TicketService.getAll(page, 5);
+      const response = await TicketService.getUnassignedAll(page, 8);
       const newTickets = response.data.data;
       console.log("Tickets",newTickets);
       setTickets((prevTickets) => {
@@ -72,7 +72,7 @@ export default function TicketAssignment() {
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
       const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
-      const isNearBottom = scrollTop + clientHeight >= scrollHeight - 5;
+      const isNearBottom = scrollTop + clientHeight >= scrollHeight - 10;
 
       if (isNearBottom && !loading) {
         setPage((prevPage) => prevPage + 1);
@@ -117,28 +117,50 @@ export default function TicketAssignment() {
   // Assignment logic with API call
   const assignTicket = async (ticketId, memberId) => {
     try {
-      await TicketService.assignTicket(ticketId, memberId);
-      setTickets((prevTickets) =>
-        prevTickets.map((ticket) =>
-          ticket.id === ticketId ? { ...ticket, assignedTo: memberId } : ticket
+      const dataPayload = {
+        id: ticketId,
+        assigned_to: memberId,
+      };
+      const response = await TicketService.assignTicket(dataPayload);
+      console.log("The ticket has been assigned to the team member", response);
+  
+      // Ensure state updates correctly
+      setTickets((prevTickets) => {
+        const updatedTickets = prevTickets.filter((ticket) => ticket.id != ticketId);
+        console.log("Updated tickets",updatedTickets);
+        return [...updatedTickets];
+      });
+  
+      // Update workload count for the assigned team member
+      setTeamMembers((prevMembers) =>
+        prevMembers.map((member) =>
+          member.id === memberId
+            ? { ...member, tickets: [...member.tickets, ticketId] }
+            : member
         )
       );
+  
       setNotification({
         type: "success",
         message: `Ticket ${ticketId} assigned successfully!`,
       });
     } catch (error) {
+      console.error("Error assigning ticket:", error);
       setNotification({
         type: "error",
         message: `Failed to assign ticket ${ticketId}. Please try again.`,
       });
     }
   };
+  
+  
+  
+  
 
   // Bulk assignment with API call
   const handleBulkAssign = async () => {
     if (!selectedMember || selectedTickets.length === 0) return;
-
+  
     try {
       await TicketService.bulkAssignTickets(selectedTickets, selectedMember);
       setTickets((prevTickets) =>
@@ -148,6 +170,16 @@ export default function TicketAssignment() {
             : ticket
         )
       );
+  
+      // Update workload count for the assigned team member
+      setTeamMembers((prevMembers) =>
+        prevMembers.map((member) =>
+          member.id === selectedMember
+            ? { ...member, tickets: [...member.tickets, ...selectedTickets] }
+            : member
+        )
+      );
+  
       setSelectedTickets([]);
       setNotification({
         type: "success",
@@ -160,6 +192,7 @@ export default function TicketAssignment() {
       });
     }
   };
+  
 
   // Filter tickets
   const filteredTickets = tickets.filter((ticket) => {
@@ -170,11 +203,7 @@ export default function TicketAssignment() {
     return matchesSearch && matchesPriority && !ticket.assignedTo;
   });
 
-  // Calculate workload for team members
-  const getMemberWorkload = (memberId) => {
-    const memberTickets = tickets.filter((ticket) => ticket.assigned_to_id === memberId).length;
-    return memberTickets;
-  };
+ 
 
   return (
     <div className="p-6 mt-5">
@@ -284,7 +313,7 @@ export default function TicketAssignment() {
             >
               {teamMembers.map((member) => (
                 <Option key={member.id} value={member.id}>
-                  {member.name} ({getMemberWorkload(member.id)} tasks)
+                  {member.name} ({member.tickets.length} tasks)
                 </Option>
               ))}
             </Select>
