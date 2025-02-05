@@ -2,6 +2,7 @@ const { where } = require("sequelize");
 const db = require("../models");
 const { encrypt, decrypt } = require("../helper/helper");
 const User = db.user;
+const Ticket = db.ticket;
 const Op = db.Sequelize.Op;
 
 exports.allAccess = (req,res)=>{
@@ -67,28 +68,50 @@ exports.getUsers = async (req,res) => {
 };
 
 
-//retrive users list depend on role
-exports.findByRole = (req, res) => {
-    const role = req.query.role;
-    console.log("The ROLE IS",role);
+//retrieve users list depend on role
+exports.findByRole = async (req, res) => {
+    const { role } = req.query;
 
-    var condition = role ? { role: { [Op.like]: `%${role}%` }} : null;
+    if (!role) {
+        return res.status(400).send({
+            message: "Role is required as a query parameter."
+        });
+    }
 
-    console.log("Find by role condition ",condition);
+    try {
+        // Find users with the specified role and include their associated tickets
+        const users = await User.findAll({
+            where: { role: role }, // Exact match for role
+            include: [
+                {
+                    model: Ticket,
+                    attributes: ['id', 'priority', 'status'], // Include relevant ticket attributes
+                    as: 'tickets' // Use the alias defined in the association
+                }
+            ]
+        });
 
-    User.findAll({ where: condition})
-    .then(data => {
+        // Format the response
+        const response = users.map(user => ({
+            id: user.emId,
+            name: user.name,
+            role: user.role,
+            tickets: user.tickets.map(ticket => ({
+                id: ticket.id,
+               
+            }))
+        }));
+
         res.status(200).send({
-            message: "All units retrieved successfully",
-            data: data
+            message: "Users retrieved successfully.",
+            data: response
         });
-    })
-    .catch(err => {
+    } catch (err) {
+        console.error("Error retrieving users:", err);
         res.status(500).send({
-            message: err.message || "Some error occurred while retrieving tutorials."
+            message: "An error occurred while retrieving users."
         });
-    });
-
+    }
 };
 
 //find a user by id

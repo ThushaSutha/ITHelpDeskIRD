@@ -16,7 +16,7 @@ import { DragIndicator, Person, Assignment, CheckCircle } from "@mui/icons-mater
 export default function TicketAssignment() {
   const [selectedTickets, setSelectedTickets] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedPriority, setSelectedPriority] = useState("all");
+  const [selectedPriority, setSelectedPriority] = useState("");
   const [selectedMember, setSelectedMember] = useState("");
   const [notification, setNotification] = useState(null);
   const [tickets, setTickets] = useState([]);
@@ -25,12 +25,6 @@ export default function TicketAssignment() {
   const scrollContainerRef = useRef(null);
   const [teamMembers, setTeamMembers] = useState([]);
 
-  // Map priority values for consistency
-  const priorityMap = {
-    "0": "low",
-    "1": "medium",
-    "2": "high",
-  };
 
   // Fetch tickets with pagination
   const retrieveTicket = async (page) => {
@@ -38,6 +32,7 @@ export default function TicketAssignment() {
     try {
       const response = await TicketService.getAll(page, 5);
       const newTickets = response.data.data;
+      console.log("Tickets",newTickets);
       setTickets((prevTickets) => {
         const existingIds = new Set(prevTickets.map((ticket) => ticket.id));
         const filteredNewTickets = newTickets.filter(
@@ -61,6 +56,7 @@ export default function TicketAssignment() {
     try {
       const response = await UserService.getByRole(role);
       setTeamMembers(response.data.data);
+      console.log("User's data",response);
     } catch (error) {
       setNotification({
         type: "error",
@@ -169,16 +165,15 @@ export default function TicketAssignment() {
   const filteredTickets = tickets.filter((ticket) => {
     const matchesSearch =
       ticket.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ticket.id.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesPriority =
-      selectedPriority === "all" ||
-      ticket.priority === priorityMap[selectedPriority];
+      ticket.model.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesPriority = selectedPriority.toString() === "" || ticket.priority.toString() === selectedPriority.toString();
     return matchesSearch && matchesPriority && !ticket.assignedTo;
   });
 
   // Calculate workload for team members
   const getMemberWorkload = (memberId) => {
-    return tickets.filter((ticket) => ticket.assignedTo === memberId).length;
+    const memberTickets = tickets.filter((ticket) => ticket.assigned_to_id === memberId).length;
+    return memberTickets;
   };
 
   return (
@@ -209,7 +204,7 @@ export default function TicketAssignment() {
           value={selectedPriority}
           onChange={(value) => setSelectedPriority(value)}
         >
-          <Option value="all">All Priorities</Option>
+          <Option value="">All Priorities</Option>
           <Option value="2">High</Option>
           <Option value="1">Medium</Option>
           <Option value="0">Low</Option>
@@ -250,7 +245,7 @@ export default function TicketAssignment() {
                   />
                   <DragIndicator className="cursor-move" />
                   <div className="flex-1">
-                    <Typography variant="h6">{ticket.id}</Typography>
+                    <Typography variant="h6">{ticket.id} {ticket.model}</Typography>
                     <div className="flex gap-2 text-sm">
                       <span
                         className={`badge ${
@@ -323,7 +318,7 @@ export default function TicketAssignment() {
                     <Typography variant="h6">{member.name}</Typography>
                     <div className="flex gap-2 text-sm">
                       <span>{member.role}</span>
-                      <span>Workload: {getMemberWorkload(member.id)} tickets</span>
+                      <span>Workload: {member.tickets.length}  tickets</span>
                     </div>
                   </div>
                   <CheckCircle className="text-green-500" />

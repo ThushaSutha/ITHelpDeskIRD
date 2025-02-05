@@ -164,6 +164,7 @@ exports.findAll = async (req, res) => {
                 status: ticket.status,
                 user_id: ticket.user_id,
                 assigned_to: ticket.assigned ? ticket.assigned.name : 'null',
+                assigned_to_id: ticket.assigned_to,
                 user_name: ticket.user ? ticket.user.name : 'No associated user',
                 priority: ticket.priority,
                 category_id: ticket.category_id,
